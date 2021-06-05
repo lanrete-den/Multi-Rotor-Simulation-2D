@@ -12,10 +12,10 @@ class XController:
         self.x_controller = P_SAT_Controller(_kp_x, _vx_sat)
 
     def evaluate(self, x_target, delta_t):
-        x_error = x_target - self.multirotor.x
+        x_error = x_target - self.multirotor.xPosition
         self.vx_target = self.x_controller.evaluate(x_error)
 
-        vx_error = self.vx_target - self.multirotor.vx
+        vx_error = self.vx_target - self.multirotor.xVelocity
         theta_target = self.vx_controller.evaluate(vx_error, delta_t)
 
         return theta_target

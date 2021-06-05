@@ -12,10 +12,10 @@ class ZController:
         self.z_controller = P_SAT_Controller(_kp_z, _vz_sat)
 
     def evaluate(self, z_target, delta_t):
-        z_error = z_target - self.multirotor.z
+        z_error = z_target - self.multirotor.zPosition
         self.vz_target = self.z_controller.evaluate(z_error)
 
-        vz_error = self.vz_target - self.multirotor.vz
+        vz_error = self.vz_target - self.multirotor.zVelocity
         power = self.vz_controller.evaluate(vz_error, delta_t)
 
         return power

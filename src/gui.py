@@ -57,15 +57,15 @@ class MainWindow(QtGui.QWidget):
         qp.drawRect(event.rect())
 
         qp.setPen(QtGui.QColor(0,0,0))
-        qp.drawText(650, 20, "X = %6.3f m" % (self.autopilot.quadrotor.x))
-        qp.drawText(650, 40, "Vx = %6.3f m/s" % (self.autopilot.quadrotor.vx))
-        qp.drawText(650, 60, "Z = %6.3f m" % (self.autopilot.quadrotor.z))
-        qp.drawText(650, 80, "Vz = %6.3f m/s" % (self.autopilot.quadrotor.vz))
+        qp.drawText(650, 20, "X = %6.3f m" % (self.autopilot.quadrotor.xPosition))
+        qp.drawText(650, 40, "Vx = %6.3f m/s" % (self.autopilot.quadrotor.xVelocity))
+        qp.drawText(650, 60, "Z = %6.3f m" % (self.autopilot.quadrotor.zPosition))
+        qp.drawText(650, 80, "Vz = %6.3f m/s" % (self.autopilot.quadrotor.zVelocity))
         qp.drawText(650,100, "Th = %6.3f deg" % (math.degrees(self.autopilot.quadrotor.theta)))
         qp.drawText(650,120, "Omega = %6.3f deg" % (math.degrees(self.autopilot.quadrotor.omega)))
 
-        x_pos = 336 + (self.autopilot.quadrotor.x * 100)
-        y_pos = 500 - (self.autopilot.quadrotor.z * 100)
+        x_pos = 336 + (self.autopilot.quadrotor.xPosition * 100)
+        y_pos = 500 - (self.autopilot.quadrotor.zPosition * 100)
 
         t = QtGui.QTransform()
         s = self.drone.size()

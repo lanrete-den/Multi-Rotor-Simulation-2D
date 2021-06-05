@@ -49,8 +49,8 @@ class MainWindow(QMainWindow):
         qp.setBrush(QColor(255,255,255))
         qp.drawRect(event.rect())
 
-        x_pos = 336 + (self.autopilot.quadrotor.x * 100)
-        y_pos = 500 - (self.autopilot.quadrotor.z * 100)
+        x_pos = 336 + (self.autopilot.quadrotor.xPosition * 100)
+        y_pos = 500 - (self.autopilot.quadrotor.zPosition * 100)
 
         t = QTransform()
         s = self.drone.size()

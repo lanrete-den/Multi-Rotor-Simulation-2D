@@ -12,12 +12,12 @@ from x_control import *
 class Autopilot:
 
     def __init__(self):
-        self.quadrotor = Quadrotor2D(1.0, 0.25)
+        self.quadrotor = Quadrotor2D(1.5, 0.25)   #mass of 1.5 kg and 0.25 arm length from the center of the multirotor to the propeller
         self.angle_controller = AngleController(self.quadrotor,
                                                 4.0, # kp theta
                                                 2.0, # kp omega
                                                 0.2, # ki omega
-                                                1.57, # omega_max
+                                                math.radians(80), # omega_max
                                                 15)  # delta_f max
 
         self.z_controller = ZController(self.quadrotor,
@@ -25,14 +25,14 @@ class Autopilot:
                                                 20.0, # kp vz
                                                 40.0, # ki vz
                                                 2, # vz_max
-                                                15)  # f max
+                                                20)  # f max total of the two propellers
 
         self.x_controller = XController(self.quadrotor,
                                                 0.2, # kp x
                                                 1.0, # kp vx
                                                 0.1, # ki vx
-                                                2, # vx_max = 2 m/s
-                                                math.radians(20))  # theta max ~30 degrees
+                                                4, # vx_max = 4 m/s
+                                                math.radians(25))  # theta max ~25 degrees
         self.theta_target = 0
         self.z_target = 0
         self.x_target = 0
