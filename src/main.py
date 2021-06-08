@@ -20,7 +20,7 @@ vettore_theta_t = []
 vettore_omega = []
 vettore_omega_t = []
 
-autopilot.theta_target = math.radians(30)
+autopilot.theta_target = math.radians(120)
 
 while t < 4:
     autopilot.run(delta_t)

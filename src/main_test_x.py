@@ -21,22 +21,24 @@ vettore_vx = []
 vettore_vx_t = []
 
 vettore_theta = [ ]
+vettore_theta_target = [ ]
 
-autopilot.x_target = 3
-autopilot.z_target = 2
+autopilot.x_target = 15
+autopilot.z_target = 10
 
-while t < 20:
+while t < 10:
     autopilot.run(delta_t)
     t = t + delta_t
 
     vettore_tempi.append(t)
-    vettore_vx.append(autopilot.quadrotor.vx)
+    vettore_vx.append(autopilot.quadrotor.xVelocity)
     vettore_vx_t.append(autopilot.x_controller.vx_target)
 
-    vettore_x.append(autopilot.quadrotor.x)
+    vettore_x.append(autopilot.quadrotor.xPosition)
     vettore_x_t.append(autopilot.x_target)
 
     vettore_theta.append(autopilot.quadrotor.theta)
+    vettore_theta_target.append(autopilot.theta_target)
 
 pylab.figure(1)
 pylab.plot(vettore_tempi, vettore_vx, 'r-+', label="Vx")
@@ -50,6 +52,7 @@ pylab.legend()
 
 pylab.figure(3)
 pylab.plot(vettore_tempi, vettore_theta, 'r-+', label="Theta")
+pylab.plot(vettore_tempi, vettore_theta_target, 'b-+', label="Theta target")
 pylab.legend()
 
 pylab.show()

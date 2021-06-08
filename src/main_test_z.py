@@ -27,10 +27,10 @@ while t < 4:
     t = t + delta_t
 
     vettore_tempi.append(t)
-    vettore_vz.append(autopilot.quadrotor.vz)
+    vettore_vz.append(autopilot.quadrotor.zVelocity)
     vettore_vz_t.append(autopilot.z_controller.vz_target)
 
-    vettore_z.append(autopilot.quadrotor.z)
+    vettore_z.append(autopilot.quadrotor.zPosition)
     vettore_z_t.append(autopilot.z_target)
 
 pylab.figure(1)
