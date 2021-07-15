@@ -3,6 +3,7 @@
 #
 
 import math
+from utilities import *
 
 from quadrotor_model import *
 from angle_control import *
@@ -37,12 +38,21 @@ class Autopilot:
         self.theta_target = 0
         self.z_target = 0
         self.x_target = 0
+        self.target_got = False
 
     def run(self, delta_t):
         self.power = self.z_controller.evaluate(self.z_target, delta_t)
         self.theta_target = - self.x_controller.evaluate(self.x_target, delta_t)
         delta_f = self.angle_controller.evaluate(self.theta_target, delta_t)
         self.quadrotor.evaluate(self.power - delta_f, self.power + delta_f, delta_t)
+        if(distanceCouple(self.quadrotor.getPosition(),(self.x_target,self.z_target)) <3 ):
+            self.target_got = True
+        else:
+            self.target_got = False
+            
+    def set_target(self,x_position,z_position):
+        self.z_target = z_position
+        self.x_target = x_position
 
 
 

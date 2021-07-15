@@ -40,48 +40,29 @@ class MainWindow(QMainWindow):
         self.timer.timeout.connect(self.go)
         self.timer.start(1000*self.delta_t)
         
+    def go_to(self,target_x, target_z):
+        self.notification = False
+        self.autopilot.set_target(target_x, target_z)
 
+    def notify_target_got(self):
+        self.notification = True
+        if self._from is not None:
+            Messaging.send_belief(self._from, 'target_got', [], 'robot')
 
+            
+    def generate_new_block(self):
+        if self.world.count_blocks() == 8:
+            return
+        while True:
+            x = int(random.uniform(1, 9)) * (Block.WIDTH + Block.GAP)
+            col = int(random.uniform(0, 7))
+            if not(self.world.floor_position_busy(x)):
+                self.world.new_block(COLOR_NAMES[col], x)
+                return
 
     def go(self):
         self.autopilot.run(self.delta_t) # autopilot + multirotor dynamics
         self.update() # repaint window
-    #TODO gestione tasti direzionali
-    def keyPressEvent(self, event):
-  
-        # if up arrow key is pressed
-        if event.key() == Qt.Key_Up:
-  
-            # if top position is attained
-            if y > 0:
-                self.label.move(x, y - self.speed)
-  
-        # if down arrow key is pressed
-        elif event.key() == Qt.Key_Down:
-  
-            # if bottom position is attained
-            # for bottom point, bottom co-ordinate will be
-            # height of window - height of label
-            if y < self.w_height - self.l_height:
-                self.label.move(x, y + self.speed)
-  
-        # if left arrow key is pressed
-        elif event.key() == Qt.Key_Left:
-  
-            # if left end position is attained
-            if x > 0:
-                self.label.move(x - self.speed, y)
-  
-        # if down arrow key is pressed
-        elif event.key() == Qt.Key_Right:
-  
-            # if right end position is attained
-            # for right end point, right co-ordinate will be
-            # width of window - width of label
-            if x < self.w_width - self.l_width:
-                self.label.move(x + self.speed, y)
-
-        
 
 
 
