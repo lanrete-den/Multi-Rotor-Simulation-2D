@@ -29,8 +29,6 @@ class MainWindow(QMainWindow):
         self.setGeometry(0, 0, 1280, 720)
         self.setWindowTitle('QuadRotor 2D Simulator')
         self.drone = QPixmap("drone.png")  #drone image
-        self.gordo = QPixmap("gordo.png")  #obstacle image
-        self.start = QPixmap("start.png")  #start image
         self.label = QLabel(self)
         self.label.resize(600, 40)
 
@@ -83,17 +81,6 @@ class MainWindow(QMainWindow):
         self.autopilot.run(self.delta_t) # autopilot + multirotor dynamics
         self.update() # repaint window
 
-
-
-    def paintObstacles(self,painter,obstacle):
-        painter.drawPixmap(100,400,80,80,obstacle)        
-        painter.drawPixmap(800,350,80,80,obstacle)
-        painter.drawPixmap(902,71,80,80,obstacle)
-        painter.drawPixmap(575,220,80,80,obstacle)        
-        painter.drawPixmap(800,600,80,80,obstacle)
-        painter.drawPixmap(300,400,80,80,obstacle)
-
-
     def mouseMoveEvent(self, event):
         self.label.setText('Mouse coords: ( %d : %d )' % (event.x(), event.y()))
 
@@ -117,10 +104,6 @@ class MainWindow(QMainWindow):
         x_pos = self.width()/2 - self.drone.width()/2 + (self.autopilot.quadrotor.xPosition * 100)
         y_pos = self.height()-(self.drone.height())-10 - (self.autopilot.quadrotor.zPosition * 100)
         
-        qp.drawPixmap(self.width()/2-self.start.width()/20,self.height() - self.start.height()/8,self.start.width() /10,self.start.height()/10,self.start)  
-        
-        self.paintObstacles(qp,self.gordo)
-
         t = QTransform()
         s = self.drone.size()
         t.translate(x_pos + s.height()/2, y_pos + s.width()/2)

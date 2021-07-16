@@ -3,13 +3,21 @@ import math
 from block import *
 from utilities import *
 
-from PyQt5.QtGui import QColor, QPen, QBrush
+from PyQt5.QtGui import QColor, QPen, QBrush, QPixmap
 from PyQt5.QtCore import Qt
 
 class World:
 
     FLOOR_LEVEL = -0.05
     eps_dist = 1
+
+    def paintObstacles(self,painter,obstacle):
+        painter.drawPixmap(100,400,80,80,obstacle)        
+        painter.drawPixmap(800,350,80,80,obstacle)
+        painter.drawPixmap(902,71,80,80,obstacle)
+        painter.drawPixmap(575,220,80,80,obstacle)        
+        painter.drawPixmap(800,600,80,80,obstacle)
+        painter.drawPixmap(300,400,80,80,obstacle)
 
     def __init__(self, ui):
         self.__blocks = []
@@ -18,6 +26,8 @@ class World:
         for slot in self.block_slot_nodes:
             self.block_slot_busy[slot] = False
         self.ui = ui
+        self.gordo = QPixmap("gordo.png")  #obstacle image
+        self.start = QPixmap("start.png")  #start image
 
     def new_block(self, uColor, node_slot):
         b = Block(uColor)
@@ -85,4 +95,7 @@ class World:
         qp.drawRect(0,window_height-10,window_width,10)
         for b in self.__blocks:
             b.paint(qp)
+        self.paintObstacles(qp,self.gordo)
+        qp.drawPixmap(window_width/2-self.start.width()/20,window_height - self.start.height()/8,self.start.width()/10,self.start.height()/10,self.start)  
+
 
