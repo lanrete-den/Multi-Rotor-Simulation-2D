@@ -36,3 +36,6 @@ class Quadrotor2D:
 
         tmpOmega = self.omega + delta_t * (f2 - f1) * self.armLength / self.momentInertia
         self.omega = tmpOmega
+
+    def get_pose_xz(self):
+        return (self.xPosition, self.zPosition)

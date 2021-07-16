@@ -4,13 +4,17 @@
 
 import sys
 import math
+import random
 
+from phidias_interface import Messaging
+from block import *
 
 from PyQt5.QtWidgets import QMainWindow, QWidget, QApplication,QLabel
 from PyQt5.QtGui import QPainter, QColor, QFont, QPixmap, QTransform,QPen,QBrush
 from PyQt5.QtCore import Qt, QTimer
 from autopilot import *
 
+COLOR_NAMES = ['red', 'green', 'blue']
 
 class MainWindow(QMainWindow):
 
@@ -50,13 +54,12 @@ class MainWindow(QMainWindow):
             Messaging.send_belief(self._from, 'target_got', [], 'robot')
 
             
-    def generate_new_block(self):
-        if self.world.count_blocks() == 8:
+    def generate_blocks(self, num_blocks):
+        if self.world.count_blocks() == 10:
             return
         while True:
-            x = int(random.uniform(1, 9)) * (Block.WIDTH + Block.GAP)
-            col = int(random.uniform(0, 7))
-            if not(self.world.floor_position_busy(x)):
+            col = int(random.uniform(0, 2))
+            if not(self.world.floor_position_busy(x, z)):
                 self.world.new_block(COLOR_NAMES[col], x)
                 return
 

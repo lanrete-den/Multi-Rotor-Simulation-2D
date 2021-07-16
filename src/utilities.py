@@ -7,6 +7,8 @@ def readNodesCoordsAndEdges(fileName):
     f= open(fileName,"r")
     
     nodes = dict()
+    block_slot_nodes = dict()
+    tower_slot_nodes = dict()
     edgesTmp = []
     edges = []
 
@@ -15,6 +17,12 @@ def readNodesCoordsAndEdges(fileName):
         elems = line.replace("\n","").replace(" ","").split(';')
         coords = elems[1].split(',')
         nodes[elems[0]] = (int(coords[0]), int(coords[1]))
+        # Save block slots in a different dictionary with a lower position
+        # nodes are in the air, blocks are located on the floor or on a shelf
+        if "tow" in elems[0]:
+            tower_slot_nodes[elems[0]] = (int(coords[0]), int(coords[1]+150))
+        if "gen" in elems[0]:
+            block_slot_nodes[elems[0]] = (int(coords[0]), int(coords[1]+100))
         adj_list = elems[2].split(',')
         for n in adj_list:
             if(elems[0] and n):
@@ -24,4 +32,5 @@ def readNodesCoordsAndEdges(fileName):
         distance = distanceCouple(nodes[edge[0]],nodes[edge[1]])   
         edges.append((edge[0],edge[1],int(math.ceil(distance))))
 
-    return nodes, edges
+
+    return nodes, block_slot_nodes, tower_slot_nodes, edges

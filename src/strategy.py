@@ -32,7 +32,6 @@ class main(Agent):
       path(P, Total, Dest, Dest) >> \
         [ 
             "P.append(Dest)", 
-            show_line(P, " ", Total),
             +selected(P, Total)
         ]
       path(P, Total, Src,  Dest)['all'] / link(Src,Next,Cost) >> \
@@ -45,7 +44,6 @@ class main(Agent):
 
       select_min(P, Total, Next, Dest) / (selected(CurrentMin, CurrentMinCost) & gt(Total, CurrentMinCost)) >> \
         [
-            show_line(P, " ", Next, ", cost ", Total, " [CUT]")
         ]
       select_min(P, Total, Next, Dest) >> \
         [
@@ -62,17 +60,9 @@ class main(Agent):
 
 ag = main()
 ag.start()
-nodes, edges = readNodesCoordsAndEdges("nodes.txt")
+nodes, _, _, edges = readNodesCoordsAndEdges("nodes.txt")
 for edge in edges:
   ag.assert_belief(link(edge[0],edge[1],edge[2]))
-  if("gen" in edge[0]):
-    ag.assert_belief(blockSlot(edge[0]))
-  if("gen" in edge[1]):
-    ag.assert_belief(blockSlot(edge[1]))
-  if("tow" in edge[1]):
-    ag.assert_belief(towerSlot(edge[1]))
-  if("tow" in edge[0]):
-    ag.assert_belief(towerSlot(edge[0]))
 
 #PHIDIAS.run()
 PHIDIAS.run_net(globals(), 'http')
