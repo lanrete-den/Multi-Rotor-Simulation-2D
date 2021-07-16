@@ -20,9 +20,9 @@ def readNodesCoordsAndEdges(fileName):
         # Save block slots in a different dictionary with a lower position
         # nodes are in the air, blocks are located on the floor or on a shelf
         if "tow" in elems[0]:
-            tower_slot_nodes[elems[0]] = (int(coords[0]), int(coords[1]+150))
+            tower_slot_nodes[elems[0]] = (float(coords[0])/100, float(coords[1])/100)
         if "gen" in elems[0]:
-            block_slot_nodes[elems[0]] = (int(coords[0]), int(coords[1]+100))
+            block_slot_nodes[elems[0]] = (float(coords[0])/100, float(coords[1])/100 + 1)
         adj_list = elems[2].split(',')
         for n in adj_list:
             if(elems[0] and n):

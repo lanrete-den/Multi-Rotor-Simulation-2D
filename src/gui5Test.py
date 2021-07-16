@@ -8,6 +8,7 @@ import random
 
 from phidias_interface import Messaging
 from block import *
+from world import *
 
 from PyQt5.QtWidgets import QMainWindow, QWidget, QApplication,QLabel
 from PyQt5.QtGui import QPainter, QColor, QFont, QPixmap, QTransform,QPen,QBrush
@@ -19,13 +20,14 @@ COLOR_NAMES = ['red', 'green', 'blue']
 class MainWindow(QMainWindow):
 
     def __init__(self):
+        self.nodes, self.block_slot_nodes, self.tower_slot_nodes, _ = readNodesCoordsAndEdges("nodes.txt")
         super().__init__()
         self.initUI()
         self.setMouseTracking(True)
 
     def initUI(self):
         self.setGeometry(0, 0, 1280, 720)
-        self.setWindowTitle('QuadRotor 2D Simulator with controls for arrow keys')
+        self.setWindowTitle('QuadRotor 2D Simulator')
         self.drone = QPixmap("drone.png")  #drone image
         self.gordo = QPixmap("gordo.png")  #obstacle image
         self.start = QPixmap("start.png")  #start image
@@ -36,6 +38,8 @@ class MainWindow(QMainWindow):
 
         self.delta_t = 1e-3 # 1ms of time-tick
         
+        self.world = World(self)
+
         self.autopilot = Autopilot()
         self.autopilot.x_target = -2
         self.autopilot.z_target = 3
@@ -57,11 +61,23 @@ class MainWindow(QMainWindow):
     def generate_blocks(self, num_blocks):
         if self.world.count_blocks() == 10:
             return
-        while True:
-            col = int(random.uniform(0, 2))
-            if not(self.world.floor_position_busy(x, z)):
-                self.world.new_block(COLOR_NAMES[col], x)
-                return
+        generated_blocks = 0
+        free_slots = []
+        for slot in self.world.block_slot_busy:
+            if not self.world.block_slot_busy[slot]:
+                free_slots.append(slot)
+        while self.world.count_blocks() < 10 and generated_blocks < num_blocks:
+            generated_blocks = generated_blocks + 1
+            node_slot = random.choice(free_slots)
+            random_color = random.choice(COLOR_NAMES)
+            self.world.new_block(random_color, node_slot)
+            free_slots.remove(node_slot)
+
+        #while True:
+        #    col = int(random.uniform(0, 2))
+        #    if not(self.world.floor_position_busy(x, z)):
+        #        self.world.new_block(COLOR_NAMES[col], x)
+        #        return
 
     def go(self):
         self.autopilot.run(self.delta_t) # autopilot + multirotor dynamics
@@ -88,30 +104,7 @@ class MainWindow(QMainWindow):
         qp.setBrush(QColor(255,255,255))
         qp.drawRect(event.rect())
 
-
-        qp.setPen(QPen(Qt.black, 5, Qt.SolidLine))
-        qp.setBrush(QColor(QBrush(Qt.red, Qt.SolidPattern)))
-        qp.drawRect(0,200,300,30)
-
-        qp.drawRect(self.width()-300,300,300,30)    #mensola 2
-
-        qp.setPen(QPen(Qt.red, 5, Qt.SolidLine))
-        qp.setBrush(QColor(QBrush(Qt.red, Qt.SolidPattern)))    #base torre rossa
-        qp.drawRect(980, self.height() - 15,60,10)
-
-        qp.setPen(QPen(Qt.green, 5, Qt.SolidLine))
-        qp.setBrush(QColor(QBrush(Qt.green, Qt.SolidPattern)))    #base torre verde
-        qp.drawRect(1080, self.height() - 15,60,10)
-
-        qp.setPen(QPen(Qt.blue, 5, Qt.SolidLine))
-        qp.setBrush(QColor(QBrush(Qt.blue, Qt.SolidPattern)))    #base torre blu
-        qp.drawRect(1180, self.height() - 15,60,10)
-
-        qp.setPen(QPen(Qt.gray, 5, Qt.SolidLine))
-        qp.setBrush(QColor(QBrush(Qt.gray, Qt.SolidPattern)))   #pavimento
-        qp.drawRect(0,self.height()-10,self.width(),10)
-
-        
+        self.world.paint(qp, self.width(), self.height())
 
         qp.setPen(QColor(0,0,0))
         qp.drawText(self.width() - 150, 20, "X = %6.3f m" % (self.autopilot.quadrotor.xPosition))
@@ -149,6 +142,7 @@ def main():
 
     app = QApplication(sys.argv)
     ex = MainWindow()
+    ex.generate_blocks(5)
     sys.exit(app.exec_())
 
 

@@ -8,8 +8,8 @@ COLOR_MAP = { 'red' : QtGui.QColor(255,0,0),
 
 class Block:
 
-    WIDTH = 0.03
-    HEIGHT = 0.03
+    WIDTH = 0.4
+    HEIGHT = 0.4
 
     def __init__(self, uColor):
         self.__color = uColor
@@ -21,16 +21,19 @@ class Block:
         return self.__pose.get_pose()
 
     def set_pose(self, x, z, a):
-        self.__pose.set_pose(x,z, a)
+        self.__pose.set_pose(x, z, a)
 
     def get_color(self):
         return self.__color
 
     def paint(self, qp):
+        #print("Trying to paint block at " + str(self.__pose.get_pose()) + " width: " + str(self.__w) + "  height: " + str(self.__h))
         qp.setPen(QtCore.Qt.black)
         qp.setBrush(COLOR_MAP[self.__color])
 
         (x, z) = self.__pose.to_pixel()
+
+        #print("x: " + str(x) + " z: " + str(z))
 
         t = QtGui.QTransform()
         t.translate(x + self.__w/2, z - self.__h/2)
@@ -38,6 +41,6 @@ class Block:
         t.translate(-(x + self.__w/2), -(z - self.__h/2))
 
         qp.setTransform(t)
-        qp.drawRect(x, z - self.__h, self.__w, self.__h)
+        qp.drawRect(x - self.__w/2, z - self.__h/2, self.__w, self.__h)
 
 

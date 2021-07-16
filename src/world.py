@@ -3,36 +3,31 @@ import math
 from block import *
 from utilities import *
 
+from PyQt5.QtGui import QColor, QPen, QBrush
+from PyQt5.QtCore import Qt
+
 class World:
 
     FLOOR_LEVEL = -0.05
     eps_dist = 1
 
-    def init_block_slots(self):
-        _, block_slot_nodes, tower_slot_nodes, _ = readNodesCoordsAndEdges("nodes.txt")
-        block_slot_busy = dict()
-        for slot in block_slot_nodes:
-            block_slot_busy[slot] = False
-
     def __init__(self, ui):
         self.__blocks = []
+        self.block_slot_busy = dict()
+        _, self.block_slot_nodes, self.tower_slot_nodes, _ = readNodesCoordsAndEdges("nodes.txt")
+        for slot in self.block_slot_nodes:
+            self.block_slot_busy[slot] = False
         self.ui = ui
 
-    def new_block(self, uColor, uX, uZ):
+    def new_block(self, uColor, node_slot):
         b = Block(uColor)
+        uX, uZ = self.block_slot_nodes[node_slot]
         b.set_pose(uX, uZ, 0)
+        self.block_slot_busy[node_slot] = True
         self.__blocks.append(b)
 
     def count_blocks(self):
         return len(self.__blocks)
-
-    def block_slot_busy(self, uX, uZ):
-        for b in self.__blocks:
-            b_pose = b.get_pose()
-            dist = distanceCouple(b_pose, (uX, uZ))
-            if dist < self.eps_dist:
-                return True
-        return False
 
     def sense_distance(self):
         robot_pose = self.quadrotor.get_pose_xz()
@@ -66,7 +61,28 @@ class World:
         else:
             return None
 
-    def paint(self, qp):
+    def paint(self, qp, window_width, window_height):
+        qp.setPen(QPen(Qt.black, 5, Qt.SolidLine))
+        qp.setBrush(QColor(QBrush(Qt.red, Qt.SolidPattern)))
+        qp.drawRect(0,200,300,30)
+
+        qp.drawRect(window_width - 300,300,300,30)    #mensola 2
+
+        qp.setPen(QPen(Qt.red, 5, Qt.SolidLine))
+        qp.setBrush(QColor(QBrush(Qt.red, Qt.SolidPattern)))    #base torre rossa
+        qp.drawRect(980, window_height - 15,60,10)
+
+        qp.setPen(QPen(Qt.green, 5, Qt.SolidLine))
+        qp.setBrush(QColor(QBrush(Qt.green, Qt.SolidPattern)))    #base torre verde
+        qp.drawRect(1080, window_height - 15,60,10)
+
+        qp.setPen(QPen(Qt.blue, 5, Qt.SolidLine))
+        qp.setBrush(QColor(QBrush(Qt.blue, Qt.SolidPattern)))    #base torre blu
+        qp.drawRect(1180, window_height - 15,60,10)
+
+        qp.setPen(QPen(Qt.gray, 5, Qt.SolidLine))
+        qp.setBrush(QColor(QBrush(Qt.gray, Qt.SolidPattern)))   #pavimento
+        qp.drawRect(0,window_height-10,window_width,10)
         for b in self.__blocks:
             b.paint(qp)
 

@@ -5,8 +5,8 @@ from phidias.Main import *
 from utilities import *
 
 
-class blockSlot(Belief): pass
-class towerSlot(Belief): pass
+#class blockSlot(Belief): pass
+#class towerSlot(Belief): pass
 class link(Belief): pass
 class path(Procedure): pass
 class select_min(Procedure): pass
