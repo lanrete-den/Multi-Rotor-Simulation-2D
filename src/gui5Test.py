@@ -57,6 +57,8 @@ class MainWindow(QMainWindow):
 
             
     def generate_blocks(self, num_blocks):
+        if num_blocks > 6:
+            return
         if self.world.count_blocks() == 10:
             return
         generated_blocks = 0
