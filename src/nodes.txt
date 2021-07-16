@@ -29,4 +29,4 @@ towZ;1180,510;
 genD;40,590;genE
 genE;120,590;genF
 genF;200,590;genG
-genG;320,610;U
+genG;320,590;U

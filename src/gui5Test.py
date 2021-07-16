@@ -5,6 +5,7 @@
 import sys
 import math
 import random
+import time
 
 from phidias_interface import Messaging
 from block import *
@@ -28,7 +29,6 @@ class MainWindow(QMainWindow):
     def initUI(self):
         self.setGeometry(0, 0, 1280, 720)
         self.setWindowTitle('QuadRotor 2D Simulator')
-        self.drone = QPixmap("drone.png")  #drone image
         self.label = QLabel(self)
         self.label.resize(600, 40)
 
@@ -39,8 +39,8 @@ class MainWindow(QMainWindow):
         self.world = World(self)
 
         self.autopilot = Autopilot()
-        self.autopilot.x_target = -2
-        self.autopilot.z_target = 3
+        self.autopilot.x_target = 1
+        self.autopilot.z_target = 0
 
         self.timer = QTimer()
         self.timer.timeout.connect(self.go)
@@ -102,20 +102,10 @@ class MainWindow(QMainWindow):
         qp.drawText(self.width() - 150, 80, "Vz = %6.3f m/s" % (self.autopilot.quadrotor.zVelocity))
         qp.drawText(self.width() - 150,100, "Th = %6.3f deg" % (math.degrees(self.autopilot.quadrotor.theta)))
         qp.drawText(self.width() - 150,120, "Omega = %6.3f deg" % (math.degrees(self.autopilot.quadrotor.omega)))
+
+        self.autopilot.quadrotor.paint(qp,self.height(),self.width())
         
-        x_pos = self.width()/2 - self.drone.width()/2 + (self.autopilot.quadrotor.xPosition * 100)
-        y_pos = self.height()-(self.drone.height())-10 - (self.autopilot.quadrotor.zPosition * 100)
         
-        t = QTransform()
-        s = self.drone.size()
-        t.translate(x_pos + s.height()/2, y_pos + s.width()/2)
-        t.rotate(-math.degrees(self.autopilot.quadrotor.theta))
-        t.translate(-(x_pos + s.height()/2), - (y_pos + s.width()/2))
-
-
-
-        qp.setTransform(t)
-        qp.drawPixmap(x_pos,y_pos,self.drone)
 
 
 
@@ -128,6 +118,8 @@ def main():
     app = QApplication(sys.argv)
     ex = MainWindow()
     ex.generate_blocks(5)
+    ex.generate_blocks(5)
+    ex.autopilot.quadrotor.set_held_block(ex.world.get_block("genG"))
     sys.exit(app.exec_())
 
 

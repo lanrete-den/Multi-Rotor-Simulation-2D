@@ -38,7 +38,7 @@ class Block:
         t = QtGui.QTransform()
         t.translate(x + self.__w/2, z - self.__h/2)
         t.rotate(-self.__pose.get_a())
-        t.translate(-(x + self.__w/2), -(z - self.__h/2))
+        t.translate(-(x + self.__w/2), - (z - self.__h/2 ))
 
         qp.setTransform(t)
         qp.drawRect(x - self.__w/2, z - self.__h/2, self.__w, self.__h)
