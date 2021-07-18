@@ -7,7 +7,7 @@ import math
 import random
 import time
 
-from phidias_interface import Messaging
+from phidias_interface import *
 from block import *
 from world import *
 
@@ -39,12 +39,17 @@ class MainWindow(QMainWindow):
         self.world = World(self)
 
         self.autopilot = Autopilot()
-        self.autopilot.x_target = -5
-        self.autopilot.z_target = 2
+        #self.autopilot.x_target = -5
+        #self.autopilot.z_target = 2
 
         self.timer = QTimer()
         self.timer.timeout.connect(self.go)
         self.timer.start(1000*self.delta_t)
+
+        self._from = None
+
+    def set_from(self, _from):
+        self._from = _from
         
     def go_to(self,target_x, target_z):
         self.notification = False
@@ -53,7 +58,9 @@ class MainWindow(QMainWindow):
     def go_to_node(self,Node):
         self.notification = False
         target_x, target_z = self.nodes[Node]
-        self.autopilot.set_target(target_x, target_z)
+        target_x, target_z = pixel_to_meter(target_x,target_z,self.width(),self.height(), (self.autopilot.quadrotor.dronePix.width()/2,self.autopilot.quadrotor.dronePix.height()-10))
+        print("going to " + Node)
+        self.autopilot.set_target(target_x,target_z)
     
     def go_to_tower(self,color):#TODO
         self.notification = False
@@ -134,8 +141,10 @@ def main():
     app = QApplication(sys.argv)
     ex = MainWindow()
     ex.generate_blocks(5)
-    ex.generate_blocks(5)
-    ex.autopilot.quadrotor.set_held_block(ex.world.get_block("genG"))
+    start_message_server_http(ex)
+
+    #ex.generate_blocks(5)
+    #ex.autopilot.quadrotor.set_held_block(ex.world.get_block("genG"))
     sys.exit(app.exec_())
 
 

@@ -61,8 +61,8 @@ class Quadrotor2D:
         return (self.xPosition, self.zPosition)
 
     def paint(self,qp, window_height,window_width):
-        x_pos = window_width/2 - self.dronePix.width()/2 + (self.xPosition * 100)
-        z_pos = window_height-(self.dronePix.height())-10 - (self.zPosition * 100)
+        x_pos = window_width/2 - self.dronePix.width() + (self.xPosition * 100)
+        z_pos = window_height-(self.dronePix.height())-30 - (self.zPosition * 100)
 
         s = self.dronePix.size()
         self.x_pos_center = x_pos + s.height()/2

@@ -2,8 +2,8 @@ import math
 
 
 def pixel_to_meter(x,z,window_width,window_height,dronepos):
-    x_meter = (window_width/2 - dronepos[0] -x)
-    z_meter = (window_height - dronepos[1] -z)
+    x_meter = -(window_width/2 - dronepos[0] -x)/100
+    z_meter = (window_height - dronepos[1] -z)/100
     return x_meter, z_meter 
 
 

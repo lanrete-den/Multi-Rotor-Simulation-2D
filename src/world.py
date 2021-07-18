@@ -41,6 +41,7 @@ class World:
         self.block_slot_busy[node_slot] = True
         self.__blocks[node_slot] = b
     
+    #I do not like that It pops the block out of the world
     def get_block(self,node_name):
         self.block_slot_busy[node_name] = False
         out_block = self.__blocks.pop(node_name)
