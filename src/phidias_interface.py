@@ -122,7 +122,7 @@ def process_incoming_request(ui, from_address, payload):
                                 ui.go_to(*Terms)
                             if Name == 'go_to_node':
                                 ui.set_from(_from)
-                                ui.go_to(*Terms)
+                                ui.go_to_node(*Terms)
                             elif Name == 'generate':
                                 ui.set_from(_from)
                                 ui.generate_blocks()

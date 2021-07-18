@@ -1,5 +1,12 @@
 import math
 
+
+def pixel_to_meter(x,z,window_width,window_height,dronepos):
+    x_meter = (window_width/2 - dronepos[0] -x)
+    z_meter = (window_height - dronepos[1] -z)
+    return x_meter, z_meter 
+
+
 def distanceCouple(tuple1,tuple2):
     return math.sqrt((tuple1[0]-tuple2[0])**2 + (tuple1[1]-tuple2[1])**2)
 
