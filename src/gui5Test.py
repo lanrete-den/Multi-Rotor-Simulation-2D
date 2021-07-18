@@ -39,8 +39,8 @@ class MainWindow(QMainWindow):
         self.world = World(self)
 
         self.autopilot = Autopilot()
-        self.autopilot.x_target = 1
-        self.autopilot.z_target = 0
+        self.autopilot.x_target = 5
+        self.autopilot.z_target = 2
 
         self.timer = QTimer()
         self.timer.timeout.connect(self.go)
@@ -48,6 +48,16 @@ class MainWindow(QMainWindow):
         
     def go_to(self,target_x, target_z):
         self.notification = False
+        self.autopilot.set_target(target_x, target_z)
+
+    def go_to_node(self,Node):
+        self.notification = False
+        target_x, target_z = self.nodes[Node]
+        self.autopilot.set_target(target_x, target_z)
+    
+    def go_to_tower(self,color):#TODO
+        self.notification = False
+        target_x, target_z = self.nodes[Node]
         self.autopilot.set_target(target_x, target_z)
 
     def notify_target_got(self):

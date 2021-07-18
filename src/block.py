@@ -25,6 +25,12 @@ class Block:
 
     def get_color(self):
         return self.__color
+    
+    def get_center_pixel_xz(self):
+        (x, z) = self.__pose.to_pixel()
+        return (x + self.__w/2), (z - self.__h/2)
+
+        
 
     def paint(self, qp):
         #print("Trying to paint block at " + str(self.__pose.get_pose()) + " width: " + str(self.__w) + "  height: " + str(self.__h))
@@ -34,13 +40,13 @@ class Block:
         (x, z) = self.__pose.to_pixel()
 
         #print("x: " + str(x) + " z: " + str(z))
-
         t = QtGui.QTransform()
-        t.translate(x + self.__w/2, z - self.__h/2)
+        t.translate(x + self.__w/2, z + self.__h/2)
         t.rotate(-self.__pose.get_a())
-        t.translate(-(x + self.__w/2), - (z - self.__h/2 ))
+        t.translate(-(x + self.__w/2), - (z + self.__h/2 ))
 
         qp.setTransform(t)
         qp.drawRect(x - self.__w/2, z - self.__h/2, self.__w, self.__h)
+        
 
 
