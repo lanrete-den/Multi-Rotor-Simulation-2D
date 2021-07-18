@@ -120,9 +120,12 @@ def process_incoming_request(ui, from_address, payload):
                             if Name == 'go_to':
                                 ui.set_from(_from)
                                 ui.go_to(*Terms)
-                            elif Name == 'new_block':
+                            if Name == 'go_to_node':
                                 ui.set_from(_from)
-                                ui.generate_new_block()
+                                ui.go_to(*Terms)
+                            elif Name == 'generate':
+                                ui.set_from(_from)
+                                ui.generate_blocks()
                             elif Name == 'sense_distance':
                                 ui.set_from(_from)
                                 ui.sense_distance()

@@ -39,7 +39,7 @@ class MainWindow(QMainWindow):
         self.world = World(self)
 
         self.autopilot = Autopilot()
-        self.autopilot.x_target = 5
+        self.autopilot.x_target = -5
         self.autopilot.z_target = 2
 
         self.timer = QTimer()
