@@ -43,7 +43,7 @@ class main(Agent):
 
       follow_path() / eq(pathLength ,N )>> [ show_line("target reached"),
                                               "N = 0"]
-      follow_path() /targetReached(Node) >> [ "currentTarget = P[N]",
+      follow_path() / targetReached(Node) >> [ "currentTarget = P[N]",
                         "N = N+1",
                         +targetIntermediateNode(currentTarget),
                         go_to_node(currentTarget)]
@@ -104,7 +104,10 @@ class main(Agent):
             sense()
         ]
 
-      +distance(D)[{'from':_A}] / (targetNode(X) & lt(D,0.035)) >> [ show_line("Block found in slot ", X),
+      closeTargetNode(Node,D) << (targetNode(Node) & lt(D,0.035))
+
+
+      +distance(D)[{'from':_A}] / closeNode(Node,D) >> [ show_line("Block found in slot ", X),
                                                                     +block(X)]
 
       +color(C)[{'from':_A}] / (targetNode(X) & block(X) & towerColor(Node,C)) >> [ show_line("Color ", C, " sampled in slot", X),
