@@ -6,6 +6,7 @@ from utilities import *
 
 
 class blockSlot(Belief): pass
+class slotNotChecked(Belief): pass
 class towerSlot(Belief): pass
 class link(Belief): pass
 class path(Procedure): pass
@@ -43,10 +44,15 @@ class main(Agent):
                                   follow_path()
                                   ]
 
-      pick() / blockSlot(Node) & droneNode(drone) >> [ 
+      pick() / slotNotChecked(Node) & blockSlot(Node) & droneNode(drone) >> [ 
                                   +targetNode(Node),
-                                  generate_and_follow_min_path(Node)
+                                  generate_and_follow_min_path(Node),
+                                  pick()
                                   ]
+      
+      pick() >> [ show_line("Finished scanning all slots"), restoreSlots() ]
+
+      restoreSlots()['all'] / blockSlot(Node) >> [ +slotNotChecked(Node) ]
 
       go(X,Z) >> [ +go_to(X,Z)[{'to': 'robot@127.0.0.1:6566'}] ]
 
@@ -106,8 +112,7 @@ class main(Agent):
       show_min() / selected(CurrentMin, CurrentMinCost)  >> \
         [
             show_line("Minimum Cost Path ", CurrentMin, ", cost ", CurrentMinCost)
-        ]
-        # TODO 
+        ] 
 
       +target_got()[{'from': _A}] / targetIntermediateNode(X) & droneNode(drone) >> \
         [
@@ -132,32 +137,13 @@ class main(Agent):
       +color(C)[{'from':_A}] / (targetNode(X) & block(X) & towerColor(Node,C)) >> [ show_line("Color ", C, " sampled in slot", X),
                                                               -block(X),
                                                               +heldBlock(X,C),
+                                                              -slotNotChecked(X),
                                                               send_heldBlock(X),
                                                               +targetNode(Node),
                                                               go_to_tower(Node)
                                                               ]
       
       go_to_tower(Node) / heldBlock(X,C) >> [ generate_and_follow_min_path(Node), -heldBlock(X,C), send_releaseBlock() ]
-
-      +color(C)[{'from':_A}] >> [ _scan_next() ]
-      +color()[{'from':_A}] >> [ _scan_next() ]
-
-      _scan_next() / (targetNode(X)) >> \
-        [
-            show_line('end')
-        ]
-
-      _scan_next() / (targetNode(X) & heldBlock(X,C)) >> \
-        [
-            show_line('block getting transported')
-            go_to_tower
-        ]
-
-      _scan_next() / (targetNode(X) & blockSlot(Node)) >> \
-        [
-            +targetNode(Node),
-            go_node(Node)
-        ]
 
 
 
@@ -170,6 +156,7 @@ for edge in edges:
   ag.assert_belief(link(edge[0],edge[1],edge[2]))
 for block_slot in block_slots:
   ag.assert_belief(blockSlot(block_slot))
+  ag.assert_belief(slotNotChecked(block_slot))
 #for tower_slot in tower_slots:
 #  ag.assert_belief(towerSlot(tower_slot))
 #  ag.assert_belief

@@ -79,6 +79,7 @@ class World:
 
     def add_block_to_tower(self, block):
         b_color = block.get_color()
+        self.__blocks.remove(block)
         for tower in self.towers:
             if b_color == tower.get_color():
                 tower.add_block_to_tower(block)
