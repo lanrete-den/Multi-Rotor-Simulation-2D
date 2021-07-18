@@ -33,7 +33,9 @@ class Quadrotor2D:
         #self.held_block.set_pose(final_x_block,final_z_block,math.degrees(self.theta))
 
     def free_block(self):
+        temp = self.held_block
         self.held_block = None
+        return temp
 
 
     def evaluate(self, f1, f2, delta_t):

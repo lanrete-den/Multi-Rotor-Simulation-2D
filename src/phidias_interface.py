@@ -132,6 +132,12 @@ def process_incoming_request(ui, from_address, payload):
                             elif Name == 'sense_color':
                                 ui.set_from(_from)
                                 ui.sense_color()
+                            elif Name == 'heldBlock':
+                                ui.set_from(_from)
+                                ui.set_held_block(*Terms)
+                            elif Name == 'releaseBlockToTower':
+                                ui.set_from(_from)
+                                ui.release_block_to_tower()
                             response = { 'result' : 'ok' }
                         else:
                             response = { 'result' : 'err',

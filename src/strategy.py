@@ -28,27 +28,46 @@ def_vars('Source', 'Target', 'Next', 'Cost', 'P', 'Total', 'CurrentMin', 'Curren
 class main(Agent):
     def main(self):
 
-
-      pick() / blockSlot(Node) & droneNode(drone)>> [ 
-                                  +targetNode(Node),
+      generate_and_follow_min_path(Node) / blockSlot(Node) & droneNode(drone) >> [
                                   path(drone,Node),
                                   "N = 0",
                                   "pathLength = len(P)",
                                   +targetReached(drone)
-                                  follow_path()]
+                                  follow_path()
+                                  ]
+      generate_and_follow_min_path(Node) / towerSlot(Node) & droneNode(drone) >> [
+                                  path(drone,Node),
+                                  "N = 0",
+                                  "pathLength = len(P)",
+                                  +targetReached(drone)
+                                  follow_path()
+                                  ]
+
+      pick() / blockSlot(Node) & droneNode(drone) >> [ 
+                                  +targetNode(Node),
+                                  generate_and_follow_min_path(Node)
+                                  ]
 
       go(X,Z) >> [ +go_to(X,Z)[{'to': 'robot@127.0.0.1:6566'}] ]
 
+      send_heldBlock(Node) >> [ +heldBlock(Node)[{'to': 'robot@127.0.0.1:6566'}] ]
+
+      send_releaseBlock() >> [ +releaseBlockToTower()[{'to': 'robot@127.0.0.1:6566'}] ]
+
       go_node(Node)  >> [ +go_to_node(Node)[{'to': 'robot@127.0.0.1:6566'}] ]
 
-      follow_path() / eq(pathLength ,N )>> [ show_line("target reached"),
+      follow_path() / eq(pathLength, N) >> [ show_line("target reached"),
                                               "N = 0"]
+
       follow_path() / targetReached(Node) >> [ "currentTarget = P[N]",
                         "N = N+1",
                         +targetIntermediateNode(currentTarget),
-                        go_to_node(currentTarget)]
+                        go_node(currentTarget),
+                        ]
       
       sense() / heldBlock(X,C) >> [ ]
+
+      next_node() >> []
 
       sense() >> [ +sense_distance()[{'to': 'robot@127.0.0.1:6566'}],
                      +sense_color()[{'to': 'robot@127.0.0.1:6566'}] ]
@@ -90,10 +109,11 @@ class main(Agent):
         ]
         # TODO 
 
-      +target_got()[{'from': _A}] / targetIntermediateNode(X) >> \
+      +target_got()[{'from': _A}] / targetIntermediateNode(X) & droneNode(drone) >> \
         [
             show_line('Reached Node ', X),
             +targetReached(X),
+            "drone = X",
             sense(),
             follow_path()
         ]
@@ -106,15 +126,19 @@ class main(Agent):
 
       closeTargetNode(Node,D) << (targetNode(Node) & lt(D,0.035))
 
-
-      +distance(D)[{'from':_A}] / closeNode(Node,D) >> [ show_line("Block found in slot ", X),
+      +distance(D)[{'from':_A}] / closeTargetNode(Node,D) >> [ show_line("Block found in slot ", X),
                                                                     +block(X)]
 
       +color(C)[{'from':_A}] / (targetNode(X) & block(X) & towerColor(Node,C)) >> [ show_line("Color ", C, " sampled in slot", X),
                                                               -block(X),
                                                               +heldBlock(X,C),
+                                                              send_heldBlock(X),
                                                               +targetNode(Node),
-                                                              _scan_next() ]
+                                                              go_to_tower(Node)
+                                                              ]
+      
+      go_to_tower(Node) / heldBlock(X,C) >> [ generate_and_follow_min_path(Node), -heldBlock(X,C), send_releaseBlock() ]
+
       +color(C)[{'from':_A}] >> [ _scan_next() ]
       +color()[{'from':_A}] >> [ _scan_next() ]
 

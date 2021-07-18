@@ -1,6 +1,7 @@
 import math
 
 from block import *
+from tower import *
 from utilities import *
 
 from PyQt5.QtGui import QColor, QPen, QBrush, QPixmap
@@ -28,6 +29,10 @@ class World:
         self.gordo = QPixmap("gordo.png")  #obstacle image
         self.start = QPixmap("start.png")  #start image
         self.eps_dist = 0.3
+        self.towers = []
+        for tower_node in self.tower_slot_nodes:
+            tower_color = tower_node.split('_')[-1]
+            self.towers.append(Tower(ui, tower_node, self.tower_slot_nodes[tower_node], tower_color))
 
     def new_block(self, uColor, node_slot):
         b = Block(uColor)
@@ -72,6 +77,13 @@ class World:
         else:
             return None
 
+    def add_block_to_tower(self, block):
+        b_color = block.get_color()
+        for tower in self.towers:
+            if b_color == tower.get_color():
+                tower.add_block_to_tower(block)
+                break
+
     def paint(self, qp, window_width, window_height):
         qp.setPen(QPen(Qt.black, 5, Qt.SolidLine))
         qp.setBrush(QColor(QBrush(Qt.red, Qt.SolidPattern)))
@@ -79,24 +91,15 @@ class World:
 
         qp.drawRect(window_width - 300,300,300,30)    #mensola 2
 
-        qp.setPen(QPen(Qt.red, 5, Qt.SolidLine))
-        qp.setBrush(QColor(QBrush(Qt.red, Qt.SolidPattern)))    #base torre rossa
-        qp.drawRect(980, window_height - 15,60,10)
-
-        qp.setPen(QPen(Qt.green, 5, Qt.SolidLine))
-        qp.setBrush(QColor(QBrush(Qt.green, Qt.SolidPattern)))    #base torre verde
-        qp.drawRect(1080, window_height - 15,60,10)
-
-        qp.setPen(QPen(Qt.blue, 5, Qt.SolidLine))
-        qp.setBrush(QColor(QBrush(Qt.blue, Qt.SolidPattern)))    #base torre blu
-        qp.drawRect(1180, window_height - 15,60,10)
+        for tower in self.towers:
+            tower.paint(qp, window_width, window_height)
 
         qp.setPen(QPen(Qt.gray, 5, Qt.SolidLine))
         qp.setBrush(QColor(QBrush(Qt.gray, Qt.SolidPattern)))   #pavimento
         qp.drawRect(0,window_height-10,window_width,10)
         for b in self.__blocks.values():
             b.paint(qp)
-        self.paintObstacles(qp,self.gordo)
+        self.paintObstacles(qp, self.gordo)
         qp.drawPixmap(window_width/2-self.start.width()/20,window_height - self.start.height()/8,self.start.width()/10,self.start.height()/10,self.start)  
 
 

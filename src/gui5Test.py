@@ -65,6 +65,12 @@ class MainWindow(QMainWindow):
         if self._from is not None:
             Messaging.send_belief(self._from, 'target_got', [], 'robot')
 
+    def set_held_block(self, Node):
+        self.autopilot.quadrotor.set_held_block(self.world.get_block(Node))
+
+    def release_block_to_tower(self):
+        released_block = self.autopilot.quadrotor.free_block()
+        self.world.add_block_to_tower(released_block)
             
     def generate_blocks(self, num_blocks):
         if num_blocks > 6:

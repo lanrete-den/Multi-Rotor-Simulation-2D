@@ -22,10 +22,10 @@ S;720,440;T,V,W
 T;530,500;genG,U,V
 U;450,590;V
 V;680,550;W
-W;830,510;towX
-towX;980,510;towY
-towY;1080,510;towZ
-towZ;1180,510;
+W;830,510;tow_red
+tow_red;980,510;tow_green
+tow_green;1080,510;tow_blue
+tow_blue;1180,510;
 genD;40,590;genE
 genE;120,590;genF
 genF;200,590;genG
