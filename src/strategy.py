@@ -146,7 +146,7 @@ class main(Agent):
         [
             show_line('Reached Node ', X),
             +targetReached(X),
-            "drone = X",
+            +droneNode(X),
             sense(),
             follow_path()
         ]
