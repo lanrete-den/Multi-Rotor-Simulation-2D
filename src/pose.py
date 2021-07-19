@@ -1,9 +1,13 @@
+from utilities import meter_to_pixel,pixel_to_meter
+
 class Pose:
 
-    def __init__(self):
+    def __init__(self,_ui):
         self.__x = 0
         self.__z = 0
         self.__a = 0
+        self.ui = _ui
+
 
     def get_a(self):
         return self.__a
@@ -17,11 +21,7 @@ class Pose:
         self.__a = a
 
     def to_pixel(self):
-        return (self.__x * 100,self.__z * 100)
-
-    @classmethod
-    def xz_to_pixel(_cls_, x, z):
-        return (x * 100, z * 100)
+        return meter_to_pixel(self.__x,self.__z,self.ui.width(),self.ui.height(),self.ui.autopilot.quadrotor.dronePix.height())
 
     @classmethod
     def pixel_scale(_cls_, val):

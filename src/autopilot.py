@@ -45,7 +45,7 @@ class Autopilot:
         self.theta_target = - self.x_controller.evaluate(self.x_target, delta_t)
         delta_f = self.angle_controller.evaluate(self.theta_target, delta_t)
         self.quadrotor.evaluate(self.power - delta_f, self.power + delta_f, delta_t)
-        if(distanceCouple(self.quadrotor.get_pose_xz(),(self.x_target,self.z_target)) <3 ):
+        if(distanceCouple(self.quadrotor.get_pose_xz(),(self.x_target,self.z_target)) <0.5 ):
             self.target_got = True
         else:
             self.target_got = False

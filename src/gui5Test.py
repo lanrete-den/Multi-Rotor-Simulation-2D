@@ -34,13 +34,15 @@ class MainWindow(QMainWindow):
 
         self.show()
 
+        self.notification = False
+
         self.delta_t = 1e-3 # 1ms of time-tick
-        
-        self.world = World(self)
 
         self.autopilot = Autopilot()
         #self.autopilot.x_target = -5
         #self.autopilot.z_target = 2
+
+        self.world = World(self)
 
         self.timer = QTimer()
         self.timer.timeout.connect(self.go)
@@ -58,7 +60,7 @@ class MainWindow(QMainWindow):
     def go_to_node(self,Node):
         self.notification = False
         target_x, target_z = self.nodes[Node]
-        target_x, target_z = pixel_to_meter(target_x,target_z,self.width(),self.height(), (self.autopilot.quadrotor.dronePix.width()/2,self.autopilot.quadrotor.dronePix.height()-10))
+        target_x, target_z = pixel_to_meter(target_x,target_z,self.width(),self.height(), self.autopilot.quadrotor.dronePix.height()-10)
         print("going to " + Node)
         self.autopilot.set_target(target_x,target_z)
     
@@ -70,6 +72,7 @@ class MainWindow(QMainWindow):
     def notify_target_got(self):
         self.notification = True
         if self._from is not None:
+            print("sending to strategy target got")
             Messaging.send_belief(self._from, 'target_got', [], 'robot')
 
     def set_held_block(self, Node):
@@ -80,6 +83,7 @@ class MainWindow(QMainWindow):
         self.world.add_block_to_tower(released_block)
             
     def generate_blocks(self, num_blocks):
+        print("generation blocks")
         if num_blocks > 6:
             return
         if self.world.count_blocks() == 10:
@@ -102,9 +106,32 @@ class MainWindow(QMainWindow):
         #        self.world.new_block(COLOR_NAMES[col], x)
         #        return
 
+    def sense_distance(self):
+        if self._from is not None:
+            d = self.world.sense_distance()
+            if d is None:
+                params = []
+            else:
+                params = [d]
+            print("sending distance " + str(d) + " to robot")
+            Messaging.send_belief(self._from, 'distance', params, 'robot')
+
+    def sense_color(self):
+        if self._from is not None:
+            d = self.world.sense_color()
+            if d is None:
+                params = []
+            else:
+                params = [d]
+            print("sending color " + str(d) + " to robot")
+            Messaging.send_belief(self._from, 'color', params, 'robot')
+
     def go(self):
         self.autopilot.run(self.delta_t) # autopilot + multirotor dynamics
         self.update() # repaint window
+
+        if self.autopilot.target_got and not(self.notification):
+            self.notify_target_got()
 
     def mouseMoveEvent(self, event):
         self.label.setText('Mouse coords: ( %d : %d )' % (event.x(), event.y()))

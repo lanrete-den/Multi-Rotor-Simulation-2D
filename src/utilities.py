@@ -1,10 +1,15 @@
 import math
 
 
-def pixel_to_meter(x,z,window_width,window_height,dronepos):
-    x_meter = -(window_width/2 - dronepos[0] -x)/100
-    z_meter = (window_height - dronepos[1] -z)/100
+def pixel_to_meter(x,z,window_width,window_height,drone_height):
+    x_meter = -(window_width/2 -x)/100
+    z_meter = (window_height - drone_height -z)/100
     return x_meter, z_meter 
+
+def meter_to_pixel(x,z,window_width,window_height,drone_height):
+    x_pixel = x*100 + window_width/2
+    z_pixel = - z*100 + window_height - drone_height
+    return x_pixel, z_pixel 
 
 
 def distanceCouple(tuple1,tuple2):
@@ -30,9 +35,9 @@ def readNodesCoordsAndEdges(fileName):
         # Save block slots in a different dictionary with a lower position
         # nodes are in the air, blocks are located on the floor or on a shelf
         if "tow" in elems[0]:
-            tower_slot_nodes[elems[0]] = (float(coords[0])/100, float(coords[1])/100)
+            tower_slot_nodes[elems[0]] = (float(coords[0]), float(coords[1]))
         if "gen" in elems[0]:
-            block_slot_nodes[elems[0]] = (float(coords[0])/100, float(coords[1])/100 + 1)
+            block_slot_nodes[elems[0]] = (float(coords[0]), float(coords[1]) + 100)
         adj_list = elems[2].split(',')
         for n in adj_list:
             if(elems[0] and n):

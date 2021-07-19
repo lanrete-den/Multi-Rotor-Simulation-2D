@@ -1,6 +1,6 @@
 
 from PyQt5 import QtGui, QtCore
-from pose import *
+from pose import Pose
 
 COLOR_MAP = { 'red' : QtGui.QColor(255,0,0),
               'green' : QtGui.QColor(0,255,0),
@@ -11,9 +11,9 @@ class Block:
     WIDTH = 0.4
     HEIGHT = 0.4
 
-    def __init__(self, uColor):
+    def __init__(self, uColor,_ui):
         self.__color = uColor
-        self.__pose = Pose()
+        self.__pose = Pose(_ui)
         self.__w = Pose.pixel_scale(Block.WIDTH)
         self.__h = Pose.pixel_scale(Block.HEIGHT)
 
@@ -38,8 +38,9 @@ class Block:
         qp.setBrush(COLOR_MAP[self.__color])
 
         (x, z) = self.__pose.to_pixel()
-
+        #(xpose,zpose) = self.__pose.get_pose()
         #print("x: " + str(x) + " z: " + str(z))
+        #print("pose x: " + str(xpose) + " z: " + str(zpose))
         t = QtGui.QTransform()
         t.translate(x + self.__w/2, z + self.__h/2)
         t.rotate(-self.__pose.get_a())

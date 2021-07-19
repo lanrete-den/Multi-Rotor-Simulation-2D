@@ -28,15 +28,18 @@ class World:
         self.ui = ui
         self.gordo = QPixmap("gordo.png")  #obstacle image
         self.start = QPixmap("start.png")  #start image
-        self.eps_dist = 0.3
         self.towers = []
         for tower_node in self.tower_slot_nodes:
             tower_color = tower_node.split('_')[-1]
-            self.towers.append(Tower(ui, tower_node, self.tower_slot_nodes[tower_node], tower_color))
+            x , z = self.tower_slot_nodes[tower_node]
+            x, z = pixel_to_meter(x,z,self.ui.width(),self.ui.height(),self.ui.autopilot.quadrotor.dronePix.height())
+            self.towers.append(Tower(ui, tower_node, (x,z), tower_color))
 
     def new_block(self, uColor, node_slot):
-        b = Block(uColor)
-        uX, uZ = self.block_slot_nodes[node_slot]
+        b = Block(uColor,self.ui)
+        uXtmp, uZtmp = self.block_slot_nodes[node_slot]
+        uX , uZ = pixel_to_meter(uXtmp, uZtmp,self.ui.width(),self.ui.height(),self.ui.autopilot.quadrotor.dronePix.height())
+        #print("coordinates for new block x: " + str(uXtmp) + " z: " + str(uZtmp) + " to meter x: " + str(uX) + " z: " + str(uZ))
         b.set_pose(uX, uZ, 0)
         self.block_slot_busy[node_slot] = True
         self.__blocks[node_slot] = b
@@ -51,32 +54,27 @@ class World:
         return len(self.__blocks)
 
     def sense_distance(self):
-        robot_pose = self.ui.quadrotor.get_pose_xz()
+        robot_pose = self.ui.autopilot.quadrotor.get_pose_xz()
         min_dist = 9999999
         for b in self.__blocks.values():
             b_pose = b.get_pose()
             dist = distanceCouple(b_pose, robot_pose)
             if dist < min_dist:
                 min_dist = dist
-        if min_dist < self.eps_dist:
-            return min_dist
-        else:
-            return None
-
+        return min_dist
+        
     def sense_color(self):
-        robot_pose = self.ui.quadrotor.get_pose_xz()
+        robot_pose = self.ui.autopilot.quadrotor.get_pose_xz()
         min_dist = 9999999
-        eps_dist = 1
         for b in self.__blocks.values():
             b_pose = b.get_pose()
             dist = distanceCouple(b_pose, robot_pose)
             if dist < min_dist:
                 min_dist = dist
                 min_block = b
-        if min_dist < eps_dist:
-            return min_block.get_color()
-        else:
-            return None
+        return min_block.get_color()
+
+
 
     def add_block_to_tower(self, block):
         b_color = block.get_color()

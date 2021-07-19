@@ -123,16 +123,16 @@ def process_incoming_request(ui, from_address, payload):
                             if Name == 'go_to_node':
                                 ui.set_from(_from)
                                 ui.go_to_node(*Terms)
-                            elif Name == 'generate':
+                            elif Name == 'generate_blocks':
                                 ui.set_from(_from)
-                                ui.generate_blocks()
+                                ui.generate_blocks(*Terms)
                             elif Name == 'sense_distance':
                                 ui.set_from(_from)
                                 ui.sense_distance()
                             elif Name == 'sense_color':
                                 ui.set_from(_from)
                                 ui.sense_color()
-                            elif Name == 'heldBlock':
+                            elif Name == 'send_held_block':
                                 ui.set_from(_from)
                                 ui.set_held_block(*Terms)
                             elif Name == 'releaseBlockToTower':
