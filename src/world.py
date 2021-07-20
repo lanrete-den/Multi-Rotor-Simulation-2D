@@ -66,19 +66,22 @@ class World:
     def sense_color(self):
         robot_pose = self.ui.autopilot.quadrotor.get_pose_xz()
         min_dist = 9999999
+        b_color = None
         for b in self.__blocks.values():
             b_pose = b.get_pose()
             dist = distanceCouple(b_pose, robot_pose)
             if dist < min_dist:
                 min_dist = dist
-                min_block = b
-        return min_block.get_color()
+                b_color = b.get_color()
+        return b_color
 
 
 
     def add_block_to_tower(self, block):
+        for key, value in self.__blocks.items():
+            if value == block:
+                del self.__blocks[key]
         b_color = block.get_color()
-        self.__blocks.remove(block)
         for tower in self.towers:
             if b_color == tower.get_color():
                 tower.add_block_to_tower(block)

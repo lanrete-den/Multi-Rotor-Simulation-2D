@@ -27,6 +27,7 @@ class go_node(Procedure) : pass
 class sense(Procedure) : pass
 class generate(Procedure) : pass
 class go_to_tower(Procedure): pass
+class go_to_start(Procedure): pass
 
 #belief of server
 class go_to_node(Belief): pass
@@ -52,7 +53,7 @@ class selected_path(SingletonBelief): pass
 class towerColor(Belief): pass
 class block(Belief): pass
 
-class closeTargetNode(Goal): pass
+class closeDroneNode(Goal): pass
 
 #testtttttting
 class not_navigating(SingletonBelief): pass
@@ -69,6 +70,15 @@ class main(Agent):
 
 
 
+      go_to_start() / droneNode(drone) >> [
+                                  show_line("Ritorno alla posizione Start"),
+                                  path(drone,"Start",[]),
+                                  "N = 1",
+                                  #"pathLength = len(P)",
+                                  +targetReached(drone),
+                                  follow_path(drone)
+                                  ]
+
       generate_and_follow_min_path(Node,P,N,pathLength) / (blockSlot(Node) & droneNode(drone)) >> [
                                   show_line(Node," generazione ",P," e seguo path ", N,pathLength),
                                   path(drone,Node,P),
@@ -77,6 +87,7 @@ class main(Agent):
                                   +targetReached(drone),
                                   follow_path(drone)
                                   ]
+
       generate_and_follow_min_path(Node,P,N,pathLength) / (towerColor(Node,C) & droneNode(drone)) >> [
                                   show_line(Node," generazione ",P," e seguo path  per tower ", N,pathLength),
                                   path(drone,Node,P),
@@ -85,11 +96,13 @@ class main(Agent):
                                   +targetReached(drone),
                                   follow_path(drone)
                                   ]
+
       pick() / (blockSlot(Node) & slotNotChecked(Node)) >> [
         pick(Node)
       ]
       pick() >> [
         show_line("Finished scanning all slots"), 
+        go_to_start(),
         restoreSlots()
       ]
 
@@ -99,14 +112,8 @@ class main(Agent):
                                   show_line("picking"),
                                   +targetNode(Node),
                                   -not_navigating(C),
-                                  generate_and_follow_min_path(Node,[],0,0),
-                                  pick()
+                                  generate_and_follow_min_path(Node,[],0,0)
                                   ]
-
-      
-      #pick(Node) >> [ show_line("Finished scanning all slots"), restoreSlots() ]
-      
-      #pick(Node) >> [ show_line(" not campo, not stanco") ]
 
       restoreSlots()['all'] / blockSlot(Node) >> [ +slotNotChecked(Node) ]
 
@@ -125,19 +132,19 @@ class main(Agent):
                                               ]
 
       follow_path(currentTarget) / (targetReached(Node) & selected_path(P,pathLength,N) ) >> [ 
-                        show_line("current node reached ",Node, "with index ", N),
+                        show_line("current node reached ",Node, " with index ", N),
                         "currentTarget = P[N]",
                         "N = N+1",
                         +selected_path(P,pathLength,N),
                         +targetIntermediateNode(currentTarget),
                         -targetReached(Node),
-                        show_line("current target ",currentTarget, "next index ", N),
+                        show_line("current target ",currentTarget, " next index ", N),
                         go_node(currentTarget)
                         ]
+
       follow_path(currentTarget) >> []
       
       sense() / heldBlock(X,C) >> [ ]
-
 
       sense() >> [ 
         show_line("sto sensando"),
@@ -193,13 +200,33 @@ class main(Agent):
             show_line("Lunghezza array: ", pathLength)
         ] 
 
-      +target_got()[{'from': _A}] / (targetIntermediateNode(Node) & targetNode(Node) & slotNotChecked(X) ) >> \
+      +target_got()[{'from': _A}] / (targetIntermediateNode(Node) & targetNode(Node) & heldBlock(X,C) & towerColor(Node,C) ) >> \
+        [
+            show_line('Reached Tower ', Node),
+            +targetReached(Node),
+            +droneNode(Node),
+            +not_navigating("1"),
+            -heldBlock(X,C),
+            send_releaseBlock(),
+            pick()
+        ]
+
+      +target_got()[{'from': _A}] / (targetIntermediateNode(Node) & eq(Node, "Start") ) >> \
+        [
+            show_line('Reached starting node ', Node),
+            +targetReached(Node),
+            +droneNode(Node)
+        ]
+
+      +target_got()[{'from': _A}] / (targetIntermediateNode(Node) & targetNode(Node) ) >> \
         [
             show_line('Reached Node ', Node),
             +targetReached(Node),
+            +droneNode(Node),
             -slotNotChecked(Node),
             +not_navigating("1"),
-            sense()
+            sense(),
+            pick()
         ]
 
       +target_got()[{'from': _A}] / (targetIntermediateNode(X) & droneNode(drone)) >> \
@@ -213,14 +240,14 @@ class main(Agent):
         ]
       
 
-      closeTargetNode(Node,D) << (targetNode(Node) & lt(D,1.5))
+      closeDroneNode(Node,D) << (droneNode(Node) & lt(D,1.5))
 
-      +distance(D)[{'from':_A}] / closeTargetNode(Node,D) >> [ 
-                                                                    show_line("Block found in slot ", X),
+      +distance(D)[{'from':_A}] / closeDroneNode(Node,D) >> [ 
+                                                                    show_line("Block found in slot ", Node),
                                                                     +block(Node)]
 
       +color(C)[{'from':_A}] / ( block(X) & towerColor(Node,C)) >> [ 
-                                                              show_line("Color ", C, " sampled in slot", X),
+                                                              show_line("Color ", C, " sampled in slot ", X),
                                                               -block(X),
                                                               +heldBlock(X,C),
                                                               -slotNotChecked(X),
@@ -229,7 +256,7 @@ class main(Agent):
                                                               go_to_tower(Node)
                                                               ]
       
-      go_to_tower(Node) / heldBlock(X,C) >> [ generate_and_follow_min_path(Node,[],0,0), -heldBlock(X,C), send_releaseBlock(), +not_navigating("1") ]
+      go_to_tower(Node) / heldBlock(X,C) >> [ generate_and_follow_min_path(Node,[],0,0) ]
 
 
 

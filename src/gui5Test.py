@@ -36,7 +36,7 @@ class MainWindow(QMainWindow):
 
         self.notification = False
 
-        self.delta_t = 1e-3 # 1ms of time-tick
+        self.delta_t = 3e-3 # 1ms of time-tick
 
         self.autopilot = Autopilot()
         #self.autopilot.x_target = -5
@@ -167,7 +167,7 @@ def main():
 
     app = QApplication(sys.argv)
     ex = MainWindow()
-    ex.generate_blocks(5)
+    ex.generate_blocks(1)
     start_message_server_http(ex)
 
     #ex.generate_blocks(5)
