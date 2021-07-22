@@ -14,7 +14,7 @@ class World:
     def paintObstacles(self,painter,obstacle):
         painter.drawPixmap(100,400,80,80,obstacle)        
         painter.drawPixmap(800,350,80,80,obstacle)
-        painter.drawPixmap(902,71,80,80,obstacle)
+        painter.drawPixmap(902,60,80,80,obstacle)
         painter.drawPixmap(575,220,80,80,obstacle)        
         painter.drawPixmap(800,600,80,80,obstacle)
         painter.drawPixmap(300,400,80,80,obstacle)
@@ -44,8 +44,11 @@ class World:
         self.block_slot_busy[node_slot] = True
         self.__blocks[node_slot] = b
     
-    #I do not like that It pops the block out of the world
     def get_block(self,node_name):
+        return self.__blocks[node_name]
+    
+    #I do not like that It pops the block out of the world
+    def pop_block(self,node_name):
         self.block_slot_busy[node_name] = False
         out_block = self.__blocks.pop(node_name)
         return out_block
@@ -86,6 +89,10 @@ class World:
             if b_color == tower.get_color():
                 tower.add_block_to_tower(block)
                 break
+
+    def release_towers(self):
+        for tower in self.towers:
+            tower.release_tower()
 
     def paint(self, qp, window_width, window_height):
         qp.setPen(QPen(Qt.black, 5, Qt.SolidLine))

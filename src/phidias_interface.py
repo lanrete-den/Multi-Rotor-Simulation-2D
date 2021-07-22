@@ -138,6 +138,9 @@ def process_incoming_request(ui, from_address, payload):
                             elif Name == 'releaseBlockToTower':
                                 ui.set_from(_from)
                                 ui.release_block_to_tower()
+                            elif Name == 'resetTowers':
+                                ui.set_from(_from)
+                                ui.resetTowers()
                             response = { 'result' : 'ok' }
                         else:
                             response = { 'result' : 'err',

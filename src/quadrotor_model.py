@@ -59,6 +59,9 @@ class Quadrotor2D:
 
     def get_pose_xz(self):
         return (self.xPosition, self.zPosition)
+    
+    def get_pose_xza(self):
+        return (self.xPosition, self.zPosition, self.theta)
 
     def paint(self,qp, window_height,window_width):
         x_pos = window_width/2 - self.dronePix.width()/2 + (self.xPosition * 100)
@@ -70,9 +73,9 @@ class Quadrotor2D:
         
         if(self.held_block is not None):
             #x_block,z_block = self.held_block.get_center_pixel_xz()
-            #final_x_block, final_z_block = rotate_point(self.x_pos_center,self.z_pos_center,self.x_pos_center+28,self.z_pos_center + 30, -self.theta) # x_block, z_block, self.theta)
-            #final_x_block, final_z_block = pixel_to_meter(final_x_block, final_z_block,window_width,window_height,self.dronePix.height())
-            final_x_block, final_z_block = rotate_point(self.xPosition,self.zPosition,self.xPosition ,self.zPosition - 0.5,self.theta)
+            final_x_block, final_z_block = rotate_point(self.x_pos_center,self.z_pos_center,self.x_pos_center+28,self.z_pos_center + 30, -self.theta) # x_block, z_block, self.theta)
+            final_x_block, final_z_block = pixel_to_meter(final_x_block, final_z_block,window_width,window_height,self.dronePix.height())
+            #final_x_block, final_z_block = rotate_point(self.xPosition,self.zPosition,self.xPosition ,self.zPosition - 0.5,-self.theta)
             self.held_block.set_pose(final_x_block,final_z_block,math.degrees(self.theta))
             self.held_block.paint(qp)
         

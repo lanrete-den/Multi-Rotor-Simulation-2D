@@ -36,13 +36,15 @@ class MainWindow(QMainWindow):
 
         self.notification = False
 
-        self.delta_t = 3e-3 # 1ms of time-tick
+        self.delta_t = 1e-2 # 10ms of time-tick
 
         self.autopilot = Autopilot()
+
         #self.autopilot.x_target = -5
         #self.autopilot.z_target = 2
 
         self.world = World(self)
+
 
         self.timer = QTimer()
         self.timer.timeout.connect(self.go)
@@ -75,8 +77,28 @@ class MainWindow(QMainWindow):
             print("sending to strategy target got")
             Messaging.send_belief(self._from, 'target_got', [], 'robot')
 
+    def go_lower(self,initial_x, initial_pos_z, shift):
+        self.autopilot.set_target(initial_x, initial_pos_z + shift)
+        if(distanceCouple(self.autopilot.quadrotor.get_pose_xz(),(self.autopilot.x_target,self.autopilot.z_target)) <0.1 ): 
+            return False
+        else : 
+            return True
+
+    
+    def go_up(self,initial_x, initial_pos_z):
+        self.autopilot.set_target(initial_x, initial_pos_z)
+        if(distanceCouple(self.autopilot.quadrotor.get_pose_xz(),(self.autopilot.x_target,self.autopilot.z_target)) <0.1 ): 
+            return False
+        else : 
+            return True
+
     def set_held_block(self, Node):
-        self.autopilot.quadrotor.set_held_block(self.world.get_block(Node))
+        #self.autopilot.take_block(Node)
+        (initial_x,initial_z) = self.autopilot.quadrotor.get_pose_xz()
+        x_block,_ = self.world.get_block(Node).get_pose()
+        while (self.go_lower(x_block,initial_z,-0.50)): pass
+        self.autopilot.quadrotor.set_held_block(self.world.pop_block(Node))
+        while (self.go_up(x_block, initial_z)): pass
 
     def release_block_to_tower(self):
         released_block = self.autopilot.quadrotor.free_block()
@@ -125,6 +147,9 @@ class MainWindow(QMainWindow):
                 params = [d]
             print("sending color " + str(d) + " to robot")
             Messaging.send_belief(self._from, 'color', params, 'robot')
+    
+    def resetTowers(self):
+        self.world.release_towers()
 
     def go(self):
         self.autopilot.run(self.delta_t) # autopilot + multirotor dynamics

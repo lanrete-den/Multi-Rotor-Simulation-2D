@@ -10,6 +10,8 @@ from angle_control import *
 from z_control import *
 from x_control import *
 
+from trajectory import Trajectory
+
 class Autopilot:
 
     def __init__(self):
@@ -18,7 +20,7 @@ class Autopilot:
                                                 4.0, # kp theta
                                                 2.0, # kp omega
                                                 0.2, # ki omega
-                                                math.radians(80), # omega_max
+                                                80*0.017453, # omega_max
                                                 15)  # delta_f max
 
         self.z_controller = ZController(self.quadrotor,
@@ -45,10 +47,12 @@ class Autopilot:
         self.theta_target = - self.x_controller.evaluate(self.x_target, delta_t)
         delta_f = self.angle_controller.evaluate(self.theta_target, delta_t)
         self.quadrotor.evaluate(self.power - delta_f, self.power + delta_f, delta_t)
-        if(distanceCouple(self.quadrotor.get_pose_xz(),(self.x_target,self.z_target)) <0.5 ):
+        if(distanceCouple(self.quadrotor.get_pose_xz(),(self.x_target,self.z_target)) <0.1 ):
             self.target_got = True
         else:
             self.target_got = False
+
+        
             
     def set_target(self,x_position,z_position):
         self.z_target = z_position

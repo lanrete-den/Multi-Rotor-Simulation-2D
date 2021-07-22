@@ -39,6 +39,9 @@ class Tower:
     def get_tower_color(self):
         return self.tower_color
 
+    def release_tower(self):
+        self.blocks.clear()
+
     def paint(self, qp, window_width, window_height):
         
         # Draw tower base
