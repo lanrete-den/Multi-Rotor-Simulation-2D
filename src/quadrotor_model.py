@@ -10,7 +10,7 @@ from utilities import rotate_point,pixel_to_meter
 
 class Quadrotor2D:
 
-    def __init__(self, _m, _L):
+    def __init__(self, _m, _L, testing=False):
         self.armLength = _L
         self.mass = _m
         self.momentInertia = (_m*(2.0*_L)**2)/12.0  #momento di inerzia approssimato ad una barra di lunghezza 2*L
@@ -23,7 +23,8 @@ class Quadrotor2D:
         self.zPosition = 0
         self.x_pos_center = 0
         self.z_pos_center = 0
-        self.dronePix = QPixmap("drone.png")  #drone image
+        if not testing:
+            self.dronePix = QPixmap("drone.png")  #drone image
         self.held_block = None
 
     def set_held_block(self,block):

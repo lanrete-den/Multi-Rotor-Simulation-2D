@@ -12,8 +12,8 @@ from x_control import *
 
 class Autopilot:
 
-    def __init__(self):
-        self.quadrotor = Quadrotor2D(1.5, 0.25)   #mass of 1.5 kg and 0.25 arm length from the center of the multirotor to the propeller
+    def __init__(self, testing=False):
+        self.quadrotor = Quadrotor2D(1.5, 0.25, testing)   #mass of 1.5 kg and 0.25 arm length from the center of the multirotor to the propeller
         self.angle_controller = AngleController(self.quadrotor,
                                                 4.0, # kp theta
                                                 2.0, # kp omega

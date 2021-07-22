@@ -7,7 +7,7 @@ import math
 
 from autopilot import *
 
-autopilot = Autopilot()
+autopilot = Autopilot(testing=True)
 
 t = 0
 delta_t = 1e-3
@@ -23,10 +23,10 @@ vettore_vx_t = []
 vettore_theta = [ ]
 vettore_theta_target = [ ]
 
-autopilot.x_target = 15
-autopilot.z_target = 10
+autopilot.x_target = 25
+autopilot.z_target = 15
 
-while t < 10:
+while t < 30:
     autopilot.run(delta_t)
     t = t + delta_t
 
