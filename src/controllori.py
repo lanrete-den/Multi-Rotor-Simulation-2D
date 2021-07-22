@@ -100,7 +100,7 @@ class ProfilePositionController:
         self.__max_speed = max_speed
         self.__decel = decel
         self.__decel_distance = max_speed * max_speed / (2.0 * decel)
-        self.__output_speed = 0 # la velocita' a cui andremo
+        self.__output_speed = 0
 
     def evaluate(self, target_position, current_position,\
 			current_speed, delta_t):
@@ -122,7 +122,6 @@ class ProfilePositionController:
                           2 * self.__decel * \
 			(self.__decel_distance - distance))
             if vel_attesa > self.__output_speed:
-                # uhm... strana condizione,
                 # vuol dire che siamo ancora in accelerazione (fase 1)
                 # continuiamo ad accelerare
                 self.__output_speed += self.__accel * delta_t

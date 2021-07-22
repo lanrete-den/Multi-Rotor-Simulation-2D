@@ -10,8 +10,6 @@ from angle_control import *
 from z_control import *
 from x_control import *
 
-from trajectory import Trajectory
-
 class Autopilot:
 
     def __init__(self):
@@ -31,7 +29,8 @@ class Autopilot:
                                                 20)  # f max total of the two propellers
 
         self.x_controller = XController(self.quadrotor,
-                                                0.3, # kp x #0.3
+                                                0.7, # starting phase acceleration
+                                                0.3, # ending phase deceleration
                                                 0.7, # kp vx #0.7
                                                 0.6, # ki vx #0.3
                                                 0.1, # kd vx #0.1
@@ -51,8 +50,6 @@ class Autopilot:
             self.target_got = True
         else:
             self.target_got = False
-
-        
             
     def set_target(self,x_position,z_position):
         self.z_target = z_position

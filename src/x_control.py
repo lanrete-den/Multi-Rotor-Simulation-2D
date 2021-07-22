@@ -6,10 +6,10 @@ from controllori import *
 
 class XController:
 
-    def __init__(self, _multirotor, _kp_x, _kp_vx, _ki_vx, _kd_vx, _vx_sat, _theta_sat):
+    def __init__(self, _multirotor, accel, decel, _kp_vx, _ki_vx, _kd_vx, _vx_sat, _theta_sat):
         self.multirotor = _multirotor
         self.vx_controller = PID_SAT_Controller(_kp_vx, _ki_vx, _kd_vx, _theta_sat)
-        self.x_controller = ProfilePositionController(_vx_sat,0.7,0.3) #P_SAT_Controller(_kp_x, _vx_sat)
+        self.x_controller = ProfilePositionController(_vx_sat,accel,decel) #P_SAT_Controller(_kp_x, _vx_sat)
 
     def evaluate(self, x_target, delta_t):
         #x_error = x_target - self.multirotor.xPosition

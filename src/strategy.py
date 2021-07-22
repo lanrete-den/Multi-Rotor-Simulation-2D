@@ -6,32 +6,75 @@ from phidias.Agent import *
 
 from utilities import *
 
+# ------- World information ------- #
 
+# Graph nodes where there are potentially blocks
 class blockSlot(Belief): pass
-class slotNotChecked(Belief): pass
-class towerSlot(Belief): pass
-class link(Belief): pass
-class selected(SingletonBelief): pass
+class block(SingletonBelief): pass
 
+# Current held block (if present)
+class heldBlock(SingletonBelief): pass
+
+# Information about towers: node (position), color, current number of blocks
+class towerColor(Belief): pass
+
+# Graph links
+class link(Belief): pass
+
+# ------- Navigation ------- #
+
+# Min path generation beliefs
+class selected(SingletonBelief): pass
 class path(Procedure): pass
 class select_min(Procedure): pass
 class show_min(Procedure): pass
+
+# ActiveBelief to prevent cyclic paths
+class nodeNotInPath(ActiveBelief):
+  def evaluate(self, P, Node):
+    return (Node() not in P())
+
+# Graph navigation beliefs
+class droneNode(SingletonBelief): pass
+class targetNode(SingletonBelief): pass
+class targetIntermediateNode(SingletonBelief): pass
+class targetReached(SingletonBelief):pass
+class selected_path(SingletonBelief): pass
+class not_navigating(SingletonBelief): pass
+
+# Graph navigation procedures
 class follow_path(Procedure) : pass
 class generate_and_follow_min_path(Procedure) : pass
-class pick(Procedure) : pass
-class restoreSlots(Procedure) : pass
-class go(Procedure) : pass
-class send_heldBlock(Procedure) : pass
-class send_releaseBlock(Procedure) : pass
-class go_node(Procedure) : pass
-class sense(Procedure) : pass
-class generate(Procedure) : pass
 class go_to_tower(Procedure): pass
 class go_to_start(Procedure): pass
-class reset_towers(Procedure): pass
+
+# Goal to check if drone is close enough to the node
+class closeDroneNode(Goal): pass
+
+# Procedure to scan the world with the drone and put blocks in the corresponding towers
+class pick(Procedure) : pass
+
+# Block nodes currently not checked by the drone
+class slotNotChecked(Belief): pass
+
+# Procedure to uncheck block slots when generating new blocks or when the world scan has ended
+class restoreSlots(Procedure) : pass
+
+# Remove tower blocks from kb when resetting towers
 class remove_towers_blocks(Procedure): pass
 
-#belief of server
+# ------- Comunication ------- #
+
+# Procedures that talk to GUI server
+class send_heldBlock(Procedure) : pass
+class send_releaseBlock(Procedure) : pass
+class sense(Procedure) : pass
+class generate(Procedure) : pass
+class go_node(Procedure) : pass
+class go(Procedure) : pass
+class reset_towers(Procedure): pass
+
+# Server beliefs
 class go_to_node(Belief): pass
 class go_to(Belief): pass
 class send_held_block(Belief): pass
@@ -41,44 +84,20 @@ class generate_blocks(Belief): pass
 class releaseBlockToTower(Belief): pass
 class resetTowers(Belief):pass
 
-#reactor
+# Reactors
 class target_got(Reactor): pass
 class distance(Reactor): pass
 class color(Reactor): pass
-
-class droneNode(SingletonBelief): pass
-class targetNode(SingletonBelief): pass
-class targetIntermediateNode(SingletonBelief): pass
-class heldBlock(SingletonBelief): pass
-class targetReached(SingletonBelief):pass
-class selected_path(SingletonBelief): pass
-
-class towerColor(Belief): pass
-class block(SingletonBelief): pass
-
-class closeDroneNode(Goal): pass
-
-#testing
-class not_navigating(SingletonBelief): pass
-class sensing(SingletonBelief): pass
-
-
-class nodeNotInPath(ActiveBelief):
-  def evaluate(self, P, Node):
-    return (Node() not in P())
 
 
 def_vars('Src', 'Dest', 'Next', 'Cost', 'P', 'Total', 'CurrentMin', 'CurrentMinCost','Node','drone','pathLength','N','currentTarget','X','Z','C','_A','D')
 class main(Agent):
     def main(self):
 
-
-
       go_to_start() / droneNode(drone) >> [
                                   show_line("Ritorno alla posizione Start"),
                                   path(drone,"Start",[]),
                                   "N = 1",
-                                  #"pathLength = len(P)",
                                   +targetReached(drone),
                                   follow_path(drone)
                                   ]
@@ -87,7 +106,6 @@ class main(Agent):
                                   show_line(Node," generazione ",P," e seguo path ", N,pathLength),
                                   path(drone,Node,P),
                                   "N = 1",
-                                  #"pathLength = len(P)",
                                   +targetReached(drone),
                                   follow_path(drone)
                                   ]
@@ -96,7 +114,6 @@ class main(Agent):
                                   show_line(Node," generazione ",P," e seguo path  per tower ", N,pathLength),
                                   path(drone,Node,P),
                                   "N = 1",
-                                  #"pathLength = len(P)",
                                   +targetReached(drone),
                                   follow_path(drone)
                                   ]
@@ -108,8 +125,6 @@ class main(Agent):
         show_line("Finished scanning all slots"), 
         go_to_start()
       ]
-
-      #pick() >> [pick("genG")]
 
       pick(Node) / (slotNotChecked(Node) & blockSlot(Node) & droneNode(drone) & not_navigating(C)) >> [ 
                                   show_line("picking"),
@@ -223,7 +238,6 @@ class main(Agent):
             "pathLength = len(CurrentMin)",
             +selected_path(CurrentMin,pathLength,1),
             -selected(CurrentMin,CurrentMinCost),
-            show_line("Lunghezza array: ", pathLength)
         ] 
 
       +target_got()[{'from': _A}] / (targetIntermediateNode(Node) & targetNode(Node) & heldBlock(X,C) & towerColor(Node,C,N) ) >> \
@@ -266,10 +280,7 @@ class main(Agent):
             -slotNotChecked(X),
             sense()
             #follow_path(X)
-        ]
-
-      #-slotNotChecked(Node) / heldBlock(X,C) >> [+slotNotChecked(Node)]
-      
+        ]      
 
       closeDroneNode(Node,D) << (droneNode(Node) & lt(D,1.22))
 
@@ -324,12 +335,10 @@ for block_slot in block_slots:
 
 ag.assert_belief(droneNode("Start"))
 ag.assert_belief(not_navigating("1"))
-#for tower_slot in tower_slots:
-#  ag.assert_belief(towerSlot(tower_slot))
-#  ag.assert_belief
+
 ag.assert_belief(towerColor("tow_red","red",0))
 ag.assert_belief(towerColor("tow_green","green",0))
 ag.assert_belief(towerColor("tow_blue","blue",0))
-#PHIDIAS.run()
+
 PHIDIAS.run_net(globals(), 'http')
 PHIDIAS.shell(globals())
