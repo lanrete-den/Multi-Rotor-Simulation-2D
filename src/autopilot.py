@@ -31,6 +31,7 @@ class Autopilot:
         self.x_controller = XController(self.quadrotor,
                                                 0.7, # starting phase acceleration
                                                 0.3, # ending phase deceleration
+                                                1.0, # kp x
                                                 0.7, # kp vx #0.7
                                                 0.6, # ki vx #0.3
                                                 0.3, # kd vx #0.1
