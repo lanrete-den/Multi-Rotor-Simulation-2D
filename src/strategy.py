@@ -103,7 +103,6 @@ class main(Agent):
                                   ]
 
       generate_and_follow_min_path(Node,P,N,pathLength) / (blockSlot(Node) & droneNode(drone)) >> [
-                                  show_line(Node," generazione ",P," e seguo path ", N,pathLength),
                                   path(drone,Node,P),
                                   "N = 1",
                                   +targetReached(drone),
@@ -111,7 +110,6 @@ class main(Agent):
                                   ]
 
       generate_and_follow_min_path(Node,P,N,pathLength) / (towerColor(Node,C,X) & droneNode(drone)) >> [
-                                  show_line(Node," generazione ",P," e seguo path  per tower ", N,pathLength),
                                   path(drone,Node,P),
                                   "N = 1",
                                   +targetReached(drone),
@@ -127,7 +125,6 @@ class main(Agent):
       ]
 
       pick(Node) / (slotNotChecked(Node) & blockSlot(Node) & droneNode(drone) & not_navigating(C)) >> [ 
-                                  show_line("picking"),
                                   +targetNode(Node),
                                   -not_navigating(C),
                                   generate_and_follow_min_path(Node,[],0,0)
@@ -141,8 +138,7 @@ class main(Agent):
 
       send_releaseBlock() >> [ +releaseBlockToTower()[{'to': 'robot@127.0.0.1:6566'}] ]
 
-      go_node(Node)  >> [ show_line("sending the go node request"),
-                          +go_to_node(Node)[{'to': 'robot@127.0.0.1:6566'}] ]
+      go_node(Node)  >> [ +go_to_node(Node)[{'to': 'robot@127.0.0.1:6566'}] ]
 
       remove_towers_blocks()['all'] / towerColor(Node,C,N) >> [
         -towerColor(Node,C,N),
@@ -154,21 +150,17 @@ class main(Agent):
         +resetTowers()[{'to': 'robot@127.0.0.1:6566'}],
         ]
 
-      #follow_path(currentTarget) / sensing(C) >> [show_line("currently sensing, not following path")]
-
       follow_path(currentTarget) / (selected_path(P,pathLength,N) & eq(pathLength, N)) >> [ 
                                               show_line("target reached"),
                                               "N = 1"
                                               ]
 
       follow_path(currentTarget) / (targetReached(Node) & selected_path(P,pathLength,N) ) >> [ 
-                        show_line("current node reached ",Node, " with index ", N),
                         "currentTarget = P[N]",
                         "N = N+1",
                         +selected_path(P,pathLength,N),
                         +targetIntermediateNode(currentTarget),
                         -targetReached(Node),
-                        show_line("current target ",currentTarget, " next index ", N),
                         go_node(currentTarget)
                         ]
 
@@ -207,7 +199,6 @@ class main(Agent):
       
       path(P, Total, Node,  Dest) / (link(Node,Dest,Cost) & nodeNotInPath(P,Dest))  >> \
         [
-            #show_line(P," path , ",Next," next"),
             "P = P.copy()",
             "P.append(Node)",
             "Total = Total + Cost",
@@ -216,7 +207,6 @@ class main(Agent):
 
       path(P, Total, Src,  Dest)['all'] / (link(Src,Next,Cost) & nodeNotInPath(P,Next))  >> \
         [
-            #show_line(P," path , ",Next," next"),
             "P = P.copy()",
             "P.append(Src)",
             "Total = Total + Cost",
@@ -253,7 +243,6 @@ class main(Agent):
 
       +target_got()[{'from': _A}] / (targetIntermediateNode(Node) & eq(Node, "Start") ) >> \
         [
-            #show_line('Reached starting node ', Node),
             +targetReached(Node),
             +droneNode(Node),
             restoreSlots()
@@ -265,7 +254,6 @@ class main(Agent):
             +targetReached(Node),
             +droneNode(Node),
             -slotNotChecked(Node),
-            show_line("checked slot node ",Node),
             +not_navigating("1"),
             sense(),
             pick()
@@ -273,13 +261,11 @@ class main(Agent):
 
       +target_got()[{'from': _A}] / (targetIntermediateNode(X)) >> \
         [
-            #show_line('Reached Node intermediate ', X),
+            show_line('Reached Node intermediate ', X),
             +targetReached(X),
             +droneNode(X),
-            show_line("checked slot node intermidiate ",X),
             -slotNotChecked(X),
             sense()
-            #follow_path(X)
         ]      
 
       closeDroneNode(Node,D) << (droneNode(Node) & lt(D,1.22))
@@ -313,7 +299,6 @@ class main(Agent):
       
       
       go_to_tower(Node) / (heldBlock(X,C) & towerColor(Node,C,Z))  >> [
-          #show_line("trying to go to tower ",Node, " with color ", C,"and length ",Z),
           -towerColor(Node,C,Z),
           "Z = Z+1", 
           +towerColor(Node,C,Z),

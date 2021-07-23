@@ -10,7 +10,6 @@ from PyQt5.QtCore import Qt
 class World:
 
     
-
     def paintObstacles(self,painter,obstacle):
         painter.drawPixmap(100,400,80,80,obstacle)        
         painter.drawPixmap(800,350,80,80,obstacle)
@@ -26,20 +25,21 @@ class World:
         for slot in self.block_slot_nodes:
             self.block_slot_busy[slot] = False
         self.ui = ui
-        self.gordo = QPixmap("gordo.png")  #obstacle image
-        self.start = QPixmap("start.png")  #start image
+        self.gordo = QPixmap("gordo.png")  # obstacle image
+        self.start = QPixmap("start.png")  # start image
         self.towers = []
+        # Initialize towers
         for tower_node in self.tower_slot_nodes:
             tower_color = tower_node.split('_')[-1]
             x , z = self.tower_slot_nodes[tower_node]
             x, z = pixel_to_meter(x,z,self.ui.width(),self.ui.height(),self.ui.autopilot.quadrotor.dronePix.height())
             self.towers.append(Tower(ui, tower_node, (x,z), tower_color))
 
+    # Add block to world
     def new_block(self, uColor, node_slot):
         b = Block(uColor,self.ui)
         uXtmp, uZtmp = self.block_slot_nodes[node_slot]
         uX , uZ = pixel_to_meter(uXtmp, uZtmp,self.ui.width(),self.ui.height(),self.ui.autopilot.quadrotor.dronePix.height())
-        #print("coordinates for new block x: " + str(uXtmp) + " z: " + str(uZtmp) + " to meter x: " + str(uX) + " z: " + str(uZ))
         b.set_pose(uX, uZ, 0)
         self.block_slot_busy[node_slot] = True
         self.__blocks[node_slot] = b
@@ -47,7 +47,7 @@ class World:
     def get_block(self,node_name):
         return self.__blocks[node_name]
     
-    #I do not like that It pops the block out of the world
+    # Remove block from world
     def pop_block(self,node_name):
         self.block_slot_busy[node_name] = False
         out_block = self.__blocks.pop(node_name)
@@ -56,6 +56,7 @@ class World:
     def count_blocks(self):
         return len(self.__blocks)
 
+    # Compute distance of closest block
     def sense_distance(self):
         robot_pose = self.ui.autopilot.quadrotor.get_pose_xz()
         min_dist = 9999999
@@ -65,7 +66,7 @@ class World:
             if dist < min_dist:
                 min_dist = dist
         return min_dist
-        
+    # Compute color of closest block
     def sense_color(self):
         robot_pose = self.ui.autopilot.quadrotor.get_pose_xz()
         min_dist = 9999999
@@ -78,8 +79,7 @@ class World:
                 b_color = b.get_color()
         return b_color
 
-
-
+    # Add block to the corresponding tower of its color
     def add_block_to_tower(self, block):
         for key, value in self.__blocks.items():
             if value == block:

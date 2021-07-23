@@ -10,9 +10,11 @@ class XController:
         self.multirotor = _multirotor
         self.vx_controller = PID_SAT_Controller(_kp_vx, _ki_vx, _kd_vx, _theta_sat)
         self.x_controller = ProfilePositionController(_vx_sat,accel,decel) #P_SAT_Controller(_kp_x, _vx_sat)
+        #self.x_controller = PID_SAT_Controller(2.0, 0.0, 0.1, _vx_sat)
 
     def evaluate(self, x_target, delta_t):
         #x_error = x_target - self.multirotor.xPosition
+        #self.vx_target = self.x_controller.evaluate(x_error, delta_t)
         self.vx_target = self.x_controller.evaluate(x_target,self.multirotor.xPosition,self.multirotor.xVelocity,delta_t)
 
         vx_error = self.vx_target - self.multirotor.xVelocity

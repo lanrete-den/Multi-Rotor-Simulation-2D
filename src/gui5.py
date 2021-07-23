@@ -40,9 +40,6 @@ class MainWindow(QMainWindow):
 
         self.autopilot = Autopilot()
 
-        #self.autopilot.x_target = -5
-        #self.autopilot.z_target = 2
-
         self.world = World(self)
 
 
@@ -54,11 +51,13 @@ class MainWindow(QMainWindow):
 
     def set_from(self, _from):
         self._from = _from
-        
+    
+    # Go to target coordinates after receving the instruction from strategy
     def go_to(self,target_x, target_z):
         self.notification = False
         self.autopilot.set_target(target_x, target_z)
 
+    # Go to target node after receving the instruction from strategy
     def go_to_node(self,Node):
         self.notification = False
         target_x, target_z = self.nodes[Node]
@@ -66,17 +65,20 @@ class MainWindow(QMainWindow):
         print("going to " + Node)
         self.autopilot.set_target(target_x,target_z)
     
-    def go_to_tower(self,color):#TODO
+    # Go to tower after receving the instruction from strategy
+    def go_to_tower(self,color):
         self.notification = False
         target_x, target_z = self.nodes[Node]
         self.autopilot.set_target(target_x, target_z)
 
+    # Informing strategy of having reached the target node
     def notify_target_got(self):
         self.notification = True
         if self._from is not None:
             print("sending to strategy target got")
             Messaging.send_belief(self._from, 'target_got', [], 'robot')
 
+    # Go lower animation when picking blocks
     def go_lower(self,initial_x, initial_pos_z, shift):
         self.autopilot.set_target(initial_x, initial_pos_z + shift)
         if(distanceCouple(self.autopilot.quadrotor.get_pose_xz(),(self.autopilot.x_target,self.autopilot.z_target)) <0.1 ): 
@@ -84,7 +86,7 @@ class MainWindow(QMainWindow):
         else : 
             return True
 
-    
+    # Go up animation when picking blocks
     def go_up(self,initial_x, initial_pos_z):
         self.autopilot.set_target(initial_x, initial_pos_z)
         if(distanceCouple(self.autopilot.quadrotor.get_pose_xz(),(self.autopilot.x_target,self.autopilot.z_target)) <0.1 ): 
@@ -92,18 +94,20 @@ class MainWindow(QMainWindow):
         else : 
             return True
 
+    # Give block to quadrotor after receiving the message from strategy
     def set_held_block(self, Node):
-        #self.autopilot.take_block(Node)
         (initial_x,initial_z) = self.autopilot.quadrotor.get_pose_xz()
         x_block,_ = self.world.get_block(Node).get_pose()
         while (self.go_lower(x_block,initial_z,-0.50)): pass
         self.autopilot.quadrotor.set_held_block(self.world.pop_block(Node))
         while (self.go_up(x_block, initial_z)): pass
 
+    # Remove block from quadrotor and add it to tower after receiving the message from strategy
     def release_block_to_tower(self):
         released_block = self.autopilot.quadrotor.free_block()
         self.world.add_block_to_tower(released_block)
-            
+
+    # Generate blocks and put them in world after receiving the message from strategy        
     def generate_blocks(self, num_blocks):
         print("generation blocks")
         if num_blocks > 6:
@@ -122,12 +126,7 @@ class MainWindow(QMainWindow):
             self.world.new_block(random_color, node_slot)
             free_slots.remove(node_slot)
 
-        #while True:
-        #    col = int(random.uniform(0, 2))
-        #    if not(self.world.floor_position_busy(x, z)):
-        #        self.world.new_block(COLOR_NAMES[col], x)
-        #        return
-
+    # Compute and send distance from closest block to strategy
     def sense_distance(self):
         if self._from is not None:
             d = self.world.sense_distance()
@@ -138,6 +137,7 @@ class MainWindow(QMainWindow):
             print("sending distance " + str(d) + " to robot")
             Messaging.send_belief(self._from, 'distance', params, 'robot')
 
+    # Compute and send color from closest block to strategy
     def sense_color(self):
         if self._from is not None:
             d = self.world.sense_color()
@@ -179,10 +179,6 @@ class MainWindow(QMainWindow):
         qp.drawText(self.width() - 150,120, "Omega = %6.3f deg" % (math.degrees(self.autopilot.quadrotor.omega)))
 
         self.autopilot.quadrotor.paint(qp,self.height(),self.width())
-        
-        
-
-
 
         qp.end()
 
@@ -192,11 +188,7 @@ def main():
 
     app = QApplication(sys.argv)
     ex = MainWindow()
-    ex.generate_blocks(1)
     start_message_server_http(ex)
-
-    #ex.generate_blocks(5)
-    #ex.autopilot.quadrotor.set_held_block(ex.world.get_block("genG"))
     sys.exit(app.exec_())
 
 

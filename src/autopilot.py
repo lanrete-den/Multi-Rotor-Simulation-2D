@@ -33,7 +33,7 @@ class Autopilot:
                                                 0.3, # ending phase deceleration
                                                 0.7, # kp vx #0.7
                                                 0.6, # ki vx #0.3
-                                                0.1, # kd vx #0.1
+                                                0.3, # kd vx #0.1
                                                 4, # vx_max = 4 m/s
                                                 math.radians(25))  # theta max ~25 degrees
         self.theta_target = 0

@@ -26,7 +26,7 @@ class Tower:
         return self.tower_color
 
     def add_block_to_tower(self, block):
-        if len(self.blocks) >= 5:
+        if len(self.blocks) >= 3:
             print("Maximum tower size reached")
             return
         tower_x, tower_z = self.tower_pos.get_pose()

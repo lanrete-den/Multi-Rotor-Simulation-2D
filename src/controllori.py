@@ -112,6 +112,7 @@ class ProfilePositionController:
         else:
             s = -1
             distance = -distance
+        # Per evitare oscillazioni alla fine del moto
         if distance < 0.01:
             return 0
 
