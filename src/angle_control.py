@@ -6,9 +6,9 @@ from controllori import *
 
 class AngleController:
 
-    def __init__(self, _multirotor, _kp_theta, _kp_omega, _ki_omega, _omega_sat, _force_sat):
+    def __init__(self, _multirotor, _kp_theta, _kp_omega, _ki_omega,_kd_omega, _omega_sat, _force_sat):
         self.multirotor = _multirotor
-        self.omega_controller = PI_SAT_Controller(_kp_omega, _ki_omega, _force_sat)
+        self.omega_controller = PID_SAT_Controller(_kp_omega, _ki_omega,_kd_omega, _force_sat)
         self.theta_controller = P_SAT_Controller(_kp_theta, _omega_sat)
 
     def evaluate(self, theta_target, delta_t):
