@@ -62,14 +62,10 @@ class MainWindow(QMainWindow):
         self.notification = False
         target_x, target_z = self.nodes[Node]
         target_x, target_z = pixel_to_meter(target_x,target_z,self.width(),self.height(), self.autopilot.quadrotor.dronePix.height()-10)
-        print("going to " + Node)
         self.autopilot.set_target(target_x,target_z)
+        print("going to " + Node)
+        print("gui target x e y " , target_x , " " ,target_z)
     
-    # Go to tower after receving the instruction from strategy
-    def go_to_tower(self,color):
-        self.notification = False
-        target_x, target_z = self.nodes[Node]
-        self.autopilot.set_target(target_x, target_z)
 
     # Informing strategy of having reached the target node
     def notify_target_got(self):

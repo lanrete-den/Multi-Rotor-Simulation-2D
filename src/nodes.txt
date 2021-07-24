@@ -20,7 +20,7 @@ R;600,430;T,V,S
 S;720,440;T,V
 T;530,500;genG,U,V
 U;450,590;V
-V;680,550;W
+V;720,500;W
 W;830,510;tow_red
 tow_red;980,510;tow_green
 tow_green;1080,510;tow_blue

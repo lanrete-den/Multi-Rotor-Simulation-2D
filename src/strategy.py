@@ -119,6 +119,7 @@ class main(Agent):
       pick() / (blockSlot(Node) & slotNotChecked(Node)) >> [
         pick(Node)
       ]
+      pick() / heldBlock(X,C)>> []
       pick() >> [
         show_line("Finished scanning all slots"), 
         go_to_start()
@@ -138,7 +139,7 @@ class main(Agent):
 
       send_releaseBlock() >> [ +releaseBlockToTower()[{'to': 'robot@127.0.0.1:6566'}] ]
 
-      go_node(Node)  >> [ +go_to_node(Node)[{'to': 'robot@127.0.0.1:6566'}] ]
+      go_node(Node)  >> [show_line("sending go node request to node ", Node), +go_to_node(Node)[{'to': 'robot@127.0.0.1:6566'}] ]
 
       remove_towers_blocks()['all'] / towerColor(Node,C,N) >> [
         -towerColor(Node,C,N),
@@ -254,9 +255,8 @@ class main(Agent):
             +targetReached(Node),
             +droneNode(Node),
             -slotNotChecked(Node),
-            +not_navigating("1"),
-            sense(),
-            pick()
+            sense()
+            #pick()
         ]
 
       +target_got()[{'from': _A}] / (targetIntermediateNode(X)) >> \
@@ -276,7 +276,9 @@ class main(Agent):
                                                                     +block(Node)
                                                                     ]
 
-      +distance(D) [{'from':_A}] /droneNode(drone) >> [follow_path(drone)]
+      +distance(D)[{'from':_A}] / (targetIntermediateNode(Node) & targetNode(Node) ) >> [+not_navigating("1"), pick()]
+
+      +distance(D) [{'from':_A}] /droneNode(drone) >> [+not_navigating("1"),follow_path(drone)]
 
       +color(C)[{'from':_A}] / ( block(X) & towerColor(Node,C,N) & geq(N,3) ) >> [ 
                                                               show_line("Tower ", C, " full, cannot pick block sampled in slot ", X),
