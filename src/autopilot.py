@@ -15,8 +15,8 @@ class Autopilot:
     def __init__(self, testing=False):
         self.quadrotor = Quadrotor2D(1.5, 0.25, testing)   #mass of 1.5 kg and 0.25 arm length from the center of the multirotor to the propeller
         self.angle_controller = AngleController(self.quadrotor,
-                                                4.0, # kp theta 4.0
-                                                2.0, # kp omega 2.0
+                                                10.0, # kp theta 4.0
+                                                4.0, # kp omega 2.0
                                                 0.2, # ki omega 0.2
                                                 0.0, # kd omega
                                                 80*0.017453, # omega_max
@@ -33,9 +33,9 @@ class Autopilot:
                                                 0.7, # starting phase acceleration
                                                 0.3, # ending phase deceleration
                                                 1.5, # kp x
-                                                1.5, # kp vx #0.7
-                                                0.1, # ki vx #0.3
-                                                0.3, # kd vx #0.1
+                                                1.5, # kp vx #0.7  ##1.5
+                                                0.1, # ki vx #0.3  ##0.1
+                                                0.3, # kd vx #0.1  ##0.3
                                                 4, # vx_max = 4 m/s
                                                 math.radians(25))  # theta max ~25 degrees
         self.theta_target = 0

@@ -104,8 +104,14 @@ class MainWindow(QMainWindow):
 
     # Remove block from quadrotor and add it to tower after receiving the message from strategy
     def release_block_to_tower(self):
+        (initial_x,initial_z) = self.autopilot.quadrotor.get_pose_xz()
+        x_block,_ = self.autopilot.quadrotor.held_block.get_pose()
+        tower_height_z = self.world.getTowerHeight(self.autopilot.quadrotor.held_block.get_color())
+        shift = initial_z - tower_height_z
+        while (self.go_lower(x_block,initial_z,-shift)): pass
         released_block = self.autopilot.quadrotor.free_block()
         self.world.add_block_to_tower(released_block)
+        while (self.go_up(x_block, initial_z)): pass
 
     # Generate blocks and put them in world after receiving the message from strategy        
     def generate_blocks(self, num_blocks):

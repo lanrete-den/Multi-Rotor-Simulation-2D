@@ -35,6 +35,10 @@ class Tower:
 
     def get_tower_length(self):
         return len(self.blocks)
+    
+    def get_height(self):
+        _, tower_z = self.tower_pos.get_pose()
+        return tower_z + (self.get_tower_length() + 1) * Block.HEIGHT + Block.HEIGHT
 
     def get_tower_color(self):
         return self.tower_color

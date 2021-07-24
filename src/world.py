@@ -93,6 +93,12 @@ class World:
     def release_towers(self):
         for tower in self.towers:
             tower.release_tower()
+    
+    def getTowerHeight(self,color):
+        for tower in self.towers:
+            if color == tower.get_color():
+                return tower.get_height()
+        
 
     def paint(self, qp, window_width, window_height):
         qp.setPen(QPen(Qt.black, 5, Qt.SolidLine))
