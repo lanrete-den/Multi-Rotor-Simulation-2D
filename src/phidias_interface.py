@@ -123,10 +123,10 @@ def process_incoming_request(ui, mutex, from_address, payload):
                                 ui.set_from(_from)
                                 ui.go_to(*Terms)
                             if Name == 'go_to_node':
-                                #mutex.acquire()
+                                mutex.acquire()
                                 ui.set_from(_from)
                                 ui.go_to_node(*Terms)
-                                #mutex.release()
+                                mutex.release()
                             elif Name == 'generate_blocks':
                                 ui.set_from(_from)
                                 ui.generate_blocks(*Terms)

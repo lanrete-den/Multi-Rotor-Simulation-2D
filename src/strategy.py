@@ -95,7 +95,7 @@ class main(Agent):
     def main(self):
 
       go_to_start() / droneNode(drone) >> [
-                                  show_line("Ritorno alla posizione Start"),
+                                  show_line("[ROBOT] : Ritorno alla posizione Start"),
                                   path(drone,"Start",[]),
                                   "N = 1",
                                   +targetReached(drone),
@@ -121,7 +121,7 @@ class main(Agent):
       ]
       pick() / heldBlock(X,C)>> []
       pick() >> [
-        show_line("Finished scanning all slots"), 
+        show_line("[ROBOT] : Finished scanning all slots"), 
         go_to_start()
       ]
 
@@ -139,7 +139,7 @@ class main(Agent):
 
       send_releaseBlock() >> [ +releaseBlockToTower()[{'to': 'robot@127.0.0.1:6566'}] ]
 
-      go_node(Node)  >> [show_line("sending go node request to node ", Node), +go_to_node(Node)[{'to': 'robot@127.0.0.1:6566'}] ]
+      go_node(Node)  >> [show_line("[ROBOT COMMUNICATION] : sending go node request to node ", Node), +go_to_node(Node)[{'to': 'robot@127.0.0.1:6566'}] ]
 
       remove_towers_blocks()['all'] / towerColor(Node,C,N) >> [
         -towerColor(Node,C,N),
@@ -152,7 +152,7 @@ class main(Agent):
         ]
 
       follow_path(currentTarget) / (selected_path(P,pathLength,N) & eq(pathLength, N)) >> [ 
-                                              show_line("target reached"),
+                                              show_line("[ROBOT] : target reached"),
                                               "N = 1"
                                               ]
 
@@ -170,18 +170,17 @@ class main(Agent):
       sense() / heldBlock(X,C) >> [ follow_path(X) ]
 
       sense() >> [ 
-        show_line("sensing"),
         +sense_distance()[{'to': 'robot@127.0.0.1:6566'}],
                      +sense_color()[{'to': 'robot@127.0.0.1:6566'}] ]
 
 
       generate() >> [ 
-        show_line("generazione 6 blocchi"),
+        show_line("[ROBOT COMMUNICATION] : richiesta generazione 6 blocchi"),
         +generate_blocks(6)[{'to': 'robot@127.0.0.1:6566'}] ,
         restoreSlots()]
-      generate(N) / gt(N,6) >> [ show_line("cannot generate more than 6 blocks") ]
+      generate(N) / gt(N,6) >> [ show_line("[ROBOT] : cannot generate more than 6 blocks") ]
       generate(N) >> [
-        show_line("generazione ",N," blocchi"), 
+        show_line("[ROBOT COMMUNICATION] : richiesta generazione ",N," blocchi"), 
         +generate_blocks(N)[{'to': 'robot@127.0.0.1:6566'}], 
         restoreSlots()]
 
@@ -216,7 +215,7 @@ class main(Agent):
 
       select_min(P, Total, Next, Dest) / (selected(CurrentMin, CurrentMinCost) & gt(Total, CurrentMinCost)) >> \
         [
-          #show_line("path cut")
+          #show_line("[ROBOT] : path cut")
         ]
       select_min(P, Total, Next, Dest) >> \
         [
@@ -225,7 +224,7 @@ class main(Agent):
 
       show_min(P) / selected(CurrentMin, CurrentMinCost)  >> \
         [
-            show_line("Minimum Cost Path ", CurrentMin, ", cost ", CurrentMinCost),
+            show_line("[ROBOT] : Minimum Cost Path ", CurrentMin, ", cost ", CurrentMinCost),
             "pathLength = len(CurrentMin)",
             +selected_path(CurrentMin,pathLength,1),
             -selected(CurrentMin,CurrentMinCost),
@@ -233,7 +232,7 @@ class main(Agent):
 
       +target_got()[{'from': _A}] / (targetIntermediateNode(Node) & targetNode(Node) & heldBlock(X,C) & towerColor(Node,C,N) ) >> \
         [
-            show_line('Reached Tower ', Node),
+            show_line('[ROBOT] : Reached Tower ', Node),
             +targetReached(Node),
             +droneNode(Node),
             +not_navigating("1"),
@@ -251,7 +250,7 @@ class main(Agent):
 
       +target_got()[{'from': _A}] / (targetIntermediateNode(Node) & targetNode(Node) ) >> \
         [
-            show_line('Reached Node ', Node),
+            show_line('[ROBOT] : Reached Node ', Node),
             +targetReached(Node),
             +droneNode(Node),
             sense()
@@ -260,17 +259,17 @@ class main(Agent):
 
       +target_got()[{'from': _A}] / (targetIntermediateNode(X)) >> \
         [
-            show_line('Reached Node intermediate ', X),
+            show_line('[ROBOT] : Reached intermediate Node ', X),
             +targetReached(X),
             +droneNode(X),
             sense()
         ]      
 
-      closeDroneNode(Node,D) << (droneNode(Node) & lt(D,1.22))
+      closeDroneNode(Node,D) << (droneNode(Node) & lt(D,1.22) & slotNotChecked(Node))
 
 
       +distance(D)[{'from':_A}] / closeDroneNode(Node,D) >> [ 
-                                                                    show_line("Block found in slot ", Node),
+                                                                    show_line("[ROBOT] : Block found in slot ", Node),
                                                                     +block(Node)
                                                                     ]
 
@@ -279,7 +278,7 @@ class main(Agent):
       +distance(D) [{'from':_A}] /droneNode(drone) >> [+not_navigating("1"), -slotNotChecked(drone), follow_path(drone)]
 
       +color(C)[{'from':_A}] / ( block(X) & towerColor(Node,C,N) & geq(N,3) ) >> [ 
-                                                              show_line("Tower ", C, " full, cannot pick block sampled in slot ", X),
+                                                              show_line("[ROBOT] : Tower ", C, " full, cannot pick block sampled in slot ", X),
                                                               -block(X),
                                                               -slotNotChecked(X),
                                                               +not_navigating("1"),
@@ -287,7 +286,7 @@ class main(Agent):
                                                               ]
 
       +color(C)[{'from':_A}] / ( block(X) & towerColor(Node,C,N) & lt(N,4) ) >> [ 
-                                                              show_line("Color ", C, " sampled in slot ", X),
+                                                              show_line("[ROBOT] : Color ", C, " sampled in slot ", X),
                                                               -block(X),
                                                               +heldBlock(X,C),
                                                               -slotNotChecked(X),

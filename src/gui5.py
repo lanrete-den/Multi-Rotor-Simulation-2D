@@ -68,15 +68,15 @@ class MainWindow(QMainWindow):
         #self.mutex.acquire()
         self.autopilot.set_target(target_x,target_z)
         #self.mutex.release()
-        print("going to " + Node)
-        print("gui target x e y " , target_x , " " ,target_z)
+        print("[WORLD] :" + " drone going to " + Node)
+        #print("gui target x e y " , target_x , " " ,target_z)
     
 
     # Informing strategy of having reached the target node
     def notify_target_got(self):
         self.notification = True
         if self._from is not None:
-            print("sending to strategy target got")
+            print("[WORLD COMMUNICATION] :" + " sending to ROBOT target got")
             Messaging.send_belief(self._from, 'target_got', [], 'robot')
 
     # Go lower animation when picking blocks
@@ -116,7 +116,7 @@ class MainWindow(QMainWindow):
 
     # Generate blocks and put them in world after receiving the message from strategy        
     def generate_blocks(self, num_blocks):
-        print("generation blocks")
+        print("[WORLD] " + "generating blocks")
         if num_blocks > 6:
             return
         if self.world.count_blocks() == 10:
@@ -141,7 +141,7 @@ class MainWindow(QMainWindow):
                 params = []
             else:
                 params = [d]
-            print("sending distance " + str(d) + " to robot")
+            print("[WORLD COMMUNICATION] :"+" sending distance " + str(d) + " to ROBOT")
             Messaging.send_belief(self._from, 'distance', params, 'robot')
 
     # Compute and send color from closest block to strategy
@@ -152,17 +152,17 @@ class MainWindow(QMainWindow):
                 params = []
             else:
                 params = [d]
-            print("sending color " + str(d) + " to robot")
+            print("[WORLD COMMUNICATION] :"+" sending color " + str(d) + " to robot")
             Messaging.send_belief(self._from, 'color', params, 'robot')
     
     def resetTowers(self):
         self.world.release_towers()
 
     def go(self):
-        #self.mutex.acquire()
+        self.mutex.acquire()
         self.autopilot.run(self.delta_t) # autopilot + multirotor dynamics
         self.update() # repaint window
-        #self.mutex.release()
+        self.mutex.release()
 
         if self.autopilot.target_got and not(self.notification):
             self.notify_target_got()
