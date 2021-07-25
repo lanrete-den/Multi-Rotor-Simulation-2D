@@ -50,8 +50,8 @@ class Autopilot:
         self.quadrotor.evaluate(self.power - delta_f, self.power + delta_f, delta_t)
         if(distanceCouple(self.quadrotor.get_pose_xz(),(self.x_target,self.z_target)) <0.1 ):
             self.target_got = True
-            #print("current x e y " , self.quadrotor.get_pose_xz())
-            #print("target x e y " , self.x_target , " " ,self.z_target)   #this should not be printed when distance <0.1
+            print("current x e y " , self.quadrotor.get_pose_xz())
+            print("target x e y " , self.x_target , " " ,self.z_target)   #this should not be printed when distance <0.1
         else:
             self.target_got = False
             

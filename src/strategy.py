@@ -167,7 +167,7 @@ class main(Agent):
 
       follow_path(currentTarget) >> []
       
-      sense() / heldBlock(X,C) >> [ follow_path(X)]
+      sense() / heldBlock(X,C) >> [ follow_path(X) ]
 
       sense() >> [ 
         show_line("sensing"),
@@ -254,7 +254,6 @@ class main(Agent):
             show_line('Reached Node ', Node),
             +targetReached(Node),
             +droneNode(Node),
-            -slotNotChecked(Node),
             sense()
             #pick()
         ]
@@ -264,7 +263,6 @@ class main(Agent):
             show_line('Reached Node intermediate ', X),
             +targetReached(X),
             +droneNode(X),
-            -slotNotChecked(X),
             sense()
         ]      
 
@@ -276,9 +274,9 @@ class main(Agent):
                                                                     +block(Node)
                                                                     ]
 
-      +distance(D)[{'from':_A}] / (targetIntermediateNode(Node) & targetNode(Node) ) >> [+not_navigating("1"), pick()]
+      +distance(D)[{'from':_A}] / (targetIntermediateNode(Node) & targetNode(Node)) >> [+not_navigating("1"), -slotNotChecked(Node), pick()]
 
-      +distance(D) [{'from':_A}] /droneNode(drone) >> [+not_navigating("1"),follow_path(drone)]
+      +distance(D) [{'from':_A}] /droneNode(drone) >> [+not_navigating("1"), -slotNotChecked(drone), follow_path(drone)]
 
       +color(C)[{'from':_A}] / ( block(X) & towerColor(Node,C,N) & geq(N,3) ) >> [ 
                                                               show_line("Tower ", C, " full, cannot pick block sampled in slot ", X),

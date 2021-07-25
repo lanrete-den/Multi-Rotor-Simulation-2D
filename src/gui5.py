@@ -16,15 +16,18 @@ from PyQt5.QtGui import QPainter, QColor, QFont, QPixmap, QTransform,QPen,QBrush
 from PyQt5.QtCore import Qt, QTimer
 from autopilot import *
 
+from threading import Lock
+
 COLOR_NAMES = ['red', 'green', 'blue']
 
 class MainWindow(QMainWindow):
 
-    def __init__(self):
+    def __init__(self, _mutex):
         self.nodes, self.block_slot_nodes, self.tower_slot_nodes, _ = readNodesCoordsAndEdges("nodes.txt")
         super().__init__()
         self.initUI()
         self.setMouseTracking(True)
+        self.mutex = _mutex
 
     def initUI(self):
         self.setGeometry(0, 0, 1280, 720)
@@ -62,7 +65,9 @@ class MainWindow(QMainWindow):
         self.notification = False
         target_x, target_z = self.nodes[Node]
         target_x, target_z = pixel_to_meter(target_x,target_z,self.width(),self.height(), self.autopilot.quadrotor.dronePix.height()-10)
+        #self.mutex.acquire()
         self.autopilot.set_target(target_x,target_z)
+        #self.mutex.release()
         print("going to " + Node)
         print("gui target x e y " , target_x , " " ,target_z)
     
@@ -154,8 +159,10 @@ class MainWindow(QMainWindow):
         self.world.release_towers()
 
     def go(self):
+        #self.mutex.acquire()
         self.autopilot.run(self.delta_t) # autopilot + multirotor dynamics
         self.update() # repaint window
+        #self.mutex.release()
 
         if self.autopilot.target_got and not(self.notification):
             self.notify_target_got()
@@ -187,10 +194,10 @@ class MainWindow(QMainWindow):
 
 
 def main():
-
+    mutex = Lock()
     app = QApplication(sys.argv)
-    ex = MainWindow()
-    start_message_server_http(ex)
+    ex = MainWindow(mutex)
+    start_message_server_http(ex, mutex)
     sys.exit(app.exec_())
 
 

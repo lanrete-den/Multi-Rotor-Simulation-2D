@@ -19,6 +19,7 @@ class PhidiasHTTPServer_RequestHandler(BaseHTTPRequestHandler):
 
     ui = None
     port = 0
+    mutex = None
 
     def do_GET(self):
         self.send_response(500)
@@ -34,7 +35,7 @@ class PhidiasHTTPServer_RequestHandler(BaseHTTPRequestHandler):
         # payload = { 'from' : source,
         #             'to': agent_name,
         #             'data' : ['belief', [ belief.name(), belief.string_terms() ] ] }
-        response = process_incoming_request(PhidiasHTTPServer_RequestHandler.ui, self.client_address[0], payload)
+        response = process_incoming_request(PhidiasHTTPServer_RequestHandler.ui, PhidiasHTTPServer_RequestHandler.mutex, self.client_address[0], payload)
 
         body = json.dumps(response)
         response = BytesIO()
@@ -66,10 +67,11 @@ def send_belief_http(agent_name, destination, belief, terms, source):
     if reply['result'] != "ok":
         print("Messaging Error: ", reply)
 
-def server_thread_http(ui, port):
+def server_thread_http(ui, port, mutex):
     server_address = ('', port)
     PhidiasHTTPServer_RequestHandler.port = port
     PhidiasHTTPServer_RequestHandler.ui = ui
+    PhidiasHTTPServer_RequestHandler.mutex = mutex
     httpd = HTTPServer(server_address, PhidiasHTTPServer_RequestHandler)
     print("")
     print("\tPHIDIAS Messaging Server is running at port ", port)
@@ -82,8 +84,8 @@ def server_thread_http(ui, port):
 #
 # MAIN server startup function
 #
-def start_message_server_http(ui, port = 6566):
-    t = threading.Thread(target = server_thread_http, args = (ui, port, ))
+def start_message_server_http(ui, mutex, port = 6566):
+    t = threading.Thread(target = server_thread_http, args = (ui, port, mutex))
     t.daemon = True
     t.start()
     return t
@@ -92,7 +94,7 @@ def start_message_server_http(ui, port = 6566):
 
 ### protocol-independent
 
-def process_incoming_request(ui, from_address, payload):
+def process_incoming_request(ui, mutex, from_address, payload):
     response = { 'result' : 'err',
                 'reason' : 'Malformed HTTP payload',
                 'data'   : payload }
@@ -121,8 +123,10 @@ def process_incoming_request(ui, from_address, payload):
                                 ui.set_from(_from)
                                 ui.go_to(*Terms)
                             if Name == 'go_to_node':
+                                #mutex.acquire()
                                 ui.set_from(_from)
                                 ui.go_to_node(*Terms)
+                                #mutex.release()
                             elif Name == 'generate_blocks':
                                 ui.set_from(_from)
                                 ui.generate_blocks(*Terms)
