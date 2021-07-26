@@ -145,6 +145,9 @@ def process_incoming_request(ui, mutex, from_address, payload):
                             elif Name == 'resetTowers':
                                 ui.set_from(_from)
                                 ui.resetTowers()
+                            elif Name == 'change_control_type':
+                                ui.set_from(_from)
+                                ui.change_control_type(*Terms)
                             response = { 'result' : 'ok' }
                         else:
                             response = { 'result' : 'err',

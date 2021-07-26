@@ -79,29 +79,20 @@ class MainWindow(QMainWindow):
             print("[WORLD COMMUNICATION] :" + " sending to ROBOT target got")
             Messaging.send_belief(self._from, 'target_got', [], 'robot')
 
-    # Go lower animation when picking blocks
-    def go_lower(self,initial_x, initial_pos_z, shift):
-        self.autopilot.set_target(initial_x, initial_pos_z + shift)
-        if(distanceCouple(self.autopilot.quadrotor.get_pose_xz(),(self.autopilot.x_target,self.autopilot.z_target)) <0.1 ): 
-            return False
-        else : 
-            return True
-
-    # Go up animation when picking blocks
-    def go_up(self,initial_x, initial_pos_z):
-        self.autopilot.set_target(initial_x, initial_pos_z)
-        if(distanceCouple(self.autopilot.quadrotor.get_pose_xz(),(self.autopilot.x_target,self.autopilot.z_target)) <0.1 ): 
-            return False
-        else : 
-            return True
+    def wait_for_target(self):
+        while not distanceCouple(self.autopilot.quadrotor.get_pose_xz(),(self.autopilot.x_target,self.autopilot.z_target)) <0.1: pass
 
     # Give block to quadrotor after receiving the message from strategy
     def set_held_block(self, Node):
         (initial_x,initial_z) = self.autopilot.quadrotor.get_pose_xz()
         x_block,_ = self.world.get_block(Node).get_pose()
-        while (self.go_lower(x_block,initial_z,-0.50)): pass
+        # Go lower animation when picking blocks
+        self.autopilot.set_target(x_block, initial_z - 0.5)
+        self.wait_for_target()
         self.autopilot.quadrotor.set_held_block(self.world.pop_block(Node))
-        while (self.go_up(x_block, initial_z)): pass
+        # Go up animation when picking blocks
+        self.autopilot.set_target(x_block, initial_z)
+        self.wait_for_target()
 
     # Remove block from quadrotor and add it to tower after receiving the message from strategy
     def release_block_to_tower(self):
@@ -109,10 +100,12 @@ class MainWindow(QMainWindow):
         x_block,_ = self.autopilot.quadrotor.held_block.get_pose()
         tower_height_z = self.world.getTowerHeight(self.autopilot.quadrotor.held_block.get_color())
         shift = initial_z - tower_height_z
-        while (self.go_lower(x_block,initial_z,-shift)): pass
+        self.autopilot.set_target(x_block, initial_z - shift)
+        self.wait_for_target()
         released_block = self.autopilot.quadrotor.free_block()
         self.world.add_block_to_tower(released_block)
-        while (self.go_up(x_block, initial_z)): pass
+        self.autopilot.set_target(x_block, initial_z)
+        self.wait_for_target()
 
     # Generate blocks and put them in world after receiving the message from strategy        
     def generate_blocks(self, num_blocks):
@@ -157,6 +150,9 @@ class MainWindow(QMainWindow):
     
     def resetTowers(self):
         self.world.release_towers()
+
+    def change_control_type(self,control_type):
+        self.autopilot.change_control_type(control_type)
 
     def go(self):
         self.mutex.acquire()

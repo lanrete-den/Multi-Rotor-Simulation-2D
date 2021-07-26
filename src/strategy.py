@@ -63,7 +63,7 @@ class restoreSlots(Procedure) : pass
 # Remove tower blocks from kb when resetting towers
 class remove_towers_blocks(Procedure): pass
 
-# ------- Comunication ------- #
+# ------- Communication ------- #
 
 # Procedures that talk to GUI server
 class send_heldBlock(Procedure) : pass
@@ -73,6 +73,9 @@ class generate(Procedure) : pass
 class go_node(Procedure) : pass
 class go(Procedure) : pass
 class reset_towers(Procedure): pass
+class use_speed_profile(Procedure): pass
+class use_virtual_robot(Procedure): pass
+class use_PID(Procedure): pass
 
 # Server beliefs
 class go_to_node(Belief): pass
@@ -83,6 +86,7 @@ class sense_distance(Belief): pass
 class generate_blocks(Belief): pass
 class releaseBlockToTower(Belief): pass
 class resetTowers(Belief):pass
+class change_control_type(Belief):pass
 
 # Reactors
 class target_got(Reactor): pass
@@ -183,6 +187,10 @@ class main(Agent):
         show_line("[ROBOT COMMUNICATION] : richiesta generazione ",N," blocchi"), 
         +generate_blocks(N)[{'to': 'robot@127.0.0.1:6566'}], 
         restoreSlots()]
+
+      use_virtual_robot() >> [ +change_control_type('virtual_robot')[{'to': 'robot@127.0.0.1:6566'}] ]
+      use_speed_profile() >> [ +change_control_type('speed_profile')[{'to': 'robot@127.0.0.1:6566'}] ]
+      use_PID() >> [ +change_control_type('PID')[{'to': 'robot@127.0.0.1:6566'}] ]
 
 
       path(Src, Dest,P) >> \

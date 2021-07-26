@@ -23,8 +23,11 @@ vettore_vx_t = []
 vettore_theta = [ ]
 vettore_theta_target = [ ]
 
-autopilot.x_target = 25
-autopilot.z_target = 15
+autopilot.set_target(0.5,0.5)
+
+self.autopilot.change_control_type('virtual_robot')
+#self.autopilot.change_control_type('speed_profile')
+#self.autopilot.change_control_type('PID')
 
 while t < 30:
     autopilot.run(delta_t)
