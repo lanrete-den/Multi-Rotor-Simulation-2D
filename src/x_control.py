@@ -9,7 +9,7 @@ class XController:
     def __init__(self, _multirotor, accel, decel, _kp_x, _kp_vx, _ki_vx, _kd_vx, _vx_sat, _theta_sat):
         self.multirotor = _multirotor
         self.vx_controller = PID_SAT_Controller(_kp_vx, _ki_vx, _kd_vx, _theta_sat)
-        self.speed_profile = False
+        self.speed_profile = True
         self.x_controller_profile = ProfilePositionController(_vx_sat,accel,decel) #P_SAT_Controller(_kp_x, _vx_sat)
         self.x_controller_PID = PID_SAT_Controller(_kp_x, 0.0, 0.3, _vx_sat)
 
