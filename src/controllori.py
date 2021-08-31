@@ -95,12 +95,13 @@ class PID_SAT_Controller:
 
 class ProfilePositionController:
 
-    def __init__(self, max_speed, accel, decel):
+    def __init__(self, max_speed, accel, decel,stop=0.01):
         self.__accel = accel
         self.__max_speed = max_speed
         self.__decel = decel
         self.__decel_distance = max_speed * max_speed / (2.0 * decel)
         self.__output_speed = 0
+        self.__stopdistance = stop
 
     def evaluate(self, target_position, current_position,\
 			current_speed, delta_t):
@@ -113,7 +114,7 @@ class ProfilePositionController:
             s = -1
             distance = -distance
         # Per evitare oscillazioni alla fine del moto
-        if distance < 0.01:
+        if distance < self.__stopdistance:
             return 0
 
         if distance < self.__decel_distance:

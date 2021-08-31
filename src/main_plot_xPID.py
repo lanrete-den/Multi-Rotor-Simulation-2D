@@ -1,9 +1,9 @@
 import pylab
 import math
 
-from autopilot import *
+from autopilotXcontrPID import *
 
-autopilot = Autopilot(testing=True)
+autopilot = AutopilotPID(testing=True)
 
 t = 0
 delta_t = 1e-3
@@ -23,8 +23,8 @@ vettore_theta_target = [ ]
 autopilot.set_target(5,5)
 
 #autopilot.change_control_type('virtual_robot')
-autopilot.change_control_type('speed_profile')
-#autopilot.change_control_type('PID')
+#autopilot.change_control_type('speed_profile')
+autopilot.change_control_type('PID')
 
 while t < 30:
     autopilot.run(delta_t)
